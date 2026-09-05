@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trail — Task Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16241F;
+    --panel: #1F332C;
+    --panel-raised: #24392F;
+    --line: #33473F;
+    --amber: #E3A857;
+    --amber-dim: #7A6238;
+    --teal: #4A8B85;
+    --parchment: #EDE6D6;
+    --muted: #8FA79D;
+    --miss: #C97B6B;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--parchment);
+    font-family: 'Inter', sans-serif;
+    min-height: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 2.1rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--parchment);
+  }
+  h1 span { color: var(--amber); }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 0;
+    max-width: 34ch;
+  }
+  .mode-tag {
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  .mode-tag.admin { color: var(--amber); border-color: var(--amber-dim); }
+
+  /* --- overview strip --- */
+  .overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 700px){ .overview { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    background: var(--panel);
+    padding: 14px 16px;
+  }
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    color: var(--amber);
+    line-height: 1.1;
+  }
+  .stat .lbl {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .panel h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    margin: 0 0 4px;
+  }
+  .panel .sub {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 0 0 18px;
+  }
+
+  /* --- auth --- */
+  .auth-entry { max-width: 420px; }
+  .auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 9px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .tab-btn.active {
+    background: var(--amber);
+    color: #21170A;
+    border-color: var(--amber);
+  }
+  .tab-btn:focus-visible { outline: 2px solid var(--parchment); outline-offset: 2px; }
+  .auth-entry label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  .auth-entry label:first-of-type { margin-top: 0; }
+  .auth-entry input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 11px 12px;
+    color: var(--parchment);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+  }
+  .auth-entry input:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+  .auth-entry button.primary { margin-top: 18px; }
+  .admin-link {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 18px;
+    display: inline-block;
+  }
+  .admin-link:hover { color: var(--parchment); }
+  .gate-error {
+    color: var(--miss);
+    font-size: 0.8rem;
+    margin-top: 10px;
+    min-height: 14px;
+  }
+  .gate-success {
+    color: var(--teal);
+    font-size: 0.8rem;
+    margin-top: 10px;
+    min-height: 14px;
+  }
+  .back-link {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+    display: inline-block;
+  }
+
+  button.primary {
+    background: var(--amber);
+    color: #21170A;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  button.primary:hover { background: #edb669; }
+  button.primary:disabled { opacity: 0.6; cursor: default; }
+  button.primary:focus-visible { outline: 2px solid var(--parchment); outline-offset: 2px; }
+
+  button.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 11px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  button.ghost:hover { color: var(--parchment); border-color: var(--muted); }
+  button.ghost:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+
+  /* --- your tasks --- */
+  .trail-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 10px;
+  }
+  .streak-count {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    color: var(--amber);
+  }
+  .streak-count small {
+    font-family: 'Inter', sans-serif;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .checkpoint {
+    display: flex;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 14px;
+  }
+  .checkpoint:last-child .stem { display: none; }
+  .marker-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .marker {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: var(--panel-raised);
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .marker:hover { transform: scale(1.06); }
+  .marker:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .marker.done {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #21170A;
+  }
+  .stem {
+    width: 2px;
+    flex: 1;
+    background: var(--line);
+    margin-top: 2px;
+  }
+  .marker.done + .stem { background: var(--amber-dim); }
+  .checkpoint-body { flex: 1; padding-top: 5px; }
+  .checkpoint-body .day-label {
+    font-size: 0.85rem;
+    color: var(--parchment);
+    margin-bottom: 5px;
+  }
+  .checkpoint-body .day-label.done-label { color: var(--muted); text-decoration: line-through; }
+  .checkpoint-body input.note {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 7px 9px;
+    color: var(--parchment);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+  }
+  .checkpoint-body input.note::placeholder { color: #566E64; }
+  .checkpoint-body input.note:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+
+  .save-status {
+    font-size: 0.75rem;
+    color: var(--muted);
+    height: 16px;
+    margin-top: 10px;
+  }
+
+  /* --- camp board (community) --- */
+  .hiker-row {
+    border-top: 1px solid var(--line);
+    padding: 13px 0;
+  }
+  .hiker-row:first-of-type { border-top: none; padding-top: 0; }
+  .hiker-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+  .hiker-name {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--parchment);
+  }
+  .hiker-name .you-tag {
+    color: var(--amber);
+    font-weight: 500;
+    font-size: 0.72rem;
+  }
+  .hiker-updated {
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .mini-trail {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .mini-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .mini-dot.done { background: var(--teal); border-color: var(--teal); }
+  .hiker-note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .empty-board, .board-msg {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 8px 0;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 22px;
+    gap: 8px;
+  }
+  .footer-row .who {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .footer-row .who b { color: var(--parchment); }
+  .footer-row .actions { display: flex; gap: 8px; }
+
+  /* --- admin (read-only) --- */
+  .admin-panel { display: none; }
+  .roster-row {
+    display: grid;
+    grid-template-columns: 1.1fr 1.6fr 0.9fr;
+    gap: 14px;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding: 13px 0;
+  }
+  .roster-row:first-of-type { border-top: none; padding-top: 0; }
+  @media (max-width: 640px){
+    .roster-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+  .roster-name { font-weight: 600; font-size: 0.9rem; }
+  .roster-progress { font-size: 0.8rem; color: var(--teal); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>The <span>Task</span> Trail</h1>
+      <p class="tagline" id="tagline">Sign up, work through your checklist, and your progress shows up live for the admin to see.</p>
+    </div>
+    <div id="modeTag" class="mode-tag" style="display:none;"></div>
+  </header>
+
+  <div id="overview" class="overview" style="display:none;">
+    <div class="stat"><div class="num" id="ovCount">0</div><div class="lbl">PEOPLE TRACKING</div></div>
+    <div class="stat"><div class="num" id="ovAvg">0%</div><div class="lbl">AVERAGE PROGRESS</div></div>
+    <div class="stat"><div class="num" id="ovLeader">—</div><div class="lbl">FURTHEST ALONG</div></div>
+    <div class="stat"><div class="num" id="ovLast">—</div><div class="lbl">LAST CHECK-IN</div></div>
+  </div>
+
+  <div id="authGate" class="panel auth-entry">
+    <div class="auth-tabs">
+      <button class="tab-btn active" id="tabSignupBtn">Sign up</button>
+      <button class="tab-btn" id="tabLoginBtn">Log in</button>
+    </div>
+
+    <div id="signupForm">
+      <h2>Create your account</h2>
+      <p class="sub">First time here? Set a username and password — this is what saves your progress.</p>
+      <label for="signupUser">Username</label>
+      <input id="signupUser" type="text" maxlength="24" autocomplete="username"/>
+      <label for="signupPass">Password</label>
+      <input id="signupPass" type="password" autocomplete="new-password"/>
+      <label for="signupPassConfirm">Confirm password</label>
+      <input id="signupPassConfirm" type="password" autocomplete="new-password"/>
+      <div><button class="primary" id="signupBtn">Create account</button></div>
+      <div class="gate-error" id="signupError"></div>
+    </div>
+
+    <div id="loginForm" style="display:none;">
+      <h2>Log in</h2>
+      <p class="sub">Already have an account? Enter your username and password.</p>
+      <label for="loginUser">Username</label>
+      <input id="loginUser" type="text" maxlength="24" autocomplete="username"/>
+      <label for="loginPass">Password</label>
+      <input id="loginPass" type="password" autocomplete="current-password"/>
+      <div><button class="primary" id="loginBtn">Log in</button></div>
+      <div class="gate-error" id="loginError"></div>
+    </div>
+
+    <button class="admin-link" id="showAdminLoginBtn">Log in as admin instead</button>
+  </div>
+
+  <div id="adminGate" class="panel auth-entry" style="display:none;">
+    <button class="back-link" id="backToLoginBtn">&larr; Back</button>
+    <h2>Admin access</h2>
+    <p class="sub">Enter the admin passcode to view everyone's progress. This account can only view — it can't change anyone's tasks.</p>
+    <label for="adminPassInput">Passcode</label>
+    <input id="adminPassInput" type="password"/>
+    <div><button class="primary" id="adminLoginBtn">Enter camp office</button></div>
+    <div class="gate-error" id="adminError"></div>
+  </div>
+
+  <div id="mainArea" class="grid" style="display:none;">
+
+    <section class="panel">
+      <div class="trail-header-row">
+        <div>
+          <h2>Your tasks</h2>
+          <p class="sub" style="margin-bottom:0;">Check off each task as you finish it. Add a note if you like.</p>
+        </div>
+        <div class="streak-count"><span id="doneCount">0</span><small>/10 DONE</small></div>
+      </div>
+      <div id="trailList" style="margin-top:16px;"></div>
+      <div class="save-status" id="saveStatus"></div>
+      <div class="footer-row">
+        <span class="who">Logged in as <b id="whoAmI"></b></span>
+        <div class="actions">
+          <button class="ghost" id="resetBtn">Reset my tasks</button>
+          <button class="ghost" id="logoutBtn">Log out</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Camp board</h2>
+      <p class="sub">Everyone currently working the checklist.</p>
+      <div id="board"><div class="board-msg">Loading camp board…</div></div>
+    </section>
+
+  </div>
+
+  <div id="adminPanel" class="admin-panel">
+    <section class="panel">
+      <div class="trail-header-row">
+        <div>
+          <h2>Everyone's progress</h2>
+          <p class="sub" style="margin-bottom:0;">View only — this account can't edit or reset anyone's tasks.</p>
+        </div>
+        <button class="ghost" id="adminLogoutBtn">Log out</button>
+      </div>
+      <div id="roster" style="margin-top:14px;"><div class="board-msg">Loading…</div></div>
+    </section>
+  </div>
+
+</div>
+
+<script>
+const TASKS = [
+  "Set your main goal for today",
+  "Complete your top-priority task",
+  "Take a break away from screens",
+  "Note one obstacle you ran into",
+  "Do one small thing for your health",
+  "Check in with someone for accountability",
+  "Tidy up your workspace",
+  "Review what worked today",
+  "Plan tomorrow's first task",
+  "Celebrate today's progress"
+];
+const TOTAL_TASKS = TASKS.length;
+const ADMIN_PASSCODE = "SUMMIT10";
+
+let myUsername = null;
+let myDays = Array(TOTAL_TASKS).fill(false);
+let myNotes = Array(TOTAL_TASKS).fill('');
+let pollTimer = null;
+let isAdmin = false;
+
+const authGate = document.getElementById('authGate');
+const adminGate = document.getElementById('adminGate');
+const mainArea = document.getElementById('mainArea');
+const adminPanel = document.getElementById('adminPanel');
+const overview = document.getElementById('overview');
+const modeTag = document.getElementById('modeTag');
+const tagline = document.getElementById('tagline');
+
+const tabSignupBtn = document.getElementById('tabSignupBtn');
+const tabLoginBtn = document.getElementById('tabLoginBtn');
+const signupForm = document.getElementById('signupForm');
+const loginForm = document.getElementById('loginForm');
+
+const signupUser = document.getElementById('signupUser');
+const signupPass = document.getElementById('signupPass');
+const signupPassConfirm = document.getElementById('signupPassConfirm');
+const signupBtn = document.getElementById('signupBtn');
+const signupError = document.getElementById('signupError');
+
+const loginUser = document.getElementById('loginUser');
+const loginPass = document.getElementById('loginPass');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+
+const showAdminLoginBtn = document.getElementById('showAdminLoginBtn');
+const backToLoginBtn = document.getElementById('backToLoginBtn');
+const adminPassInput = document.getElementById('adminPassInput');
+const adminLoginBtn = document.getElementById('adminLoginBtn');
+const adminError = document.getElementById('adminError');
+const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
+const trailList = document.getElementById('trailList');
+const doneCountEl = document.getElementById('doneCount');
+const saveStatus = document.getElementById('saveStatus');
+const whoAmI = document.getElementById('whoAmI');
+const board = document.getElementById('board');
+const roster = document.getElementById('roster');
+const resetBtn = document.getElementById('resetBtn');
+
+function trackerKey(u){ return 'tracker:' + u.trim().toLowerCase(); }
+function accountKey(u){ return 'account:' + u.trim().toLowerCase(); }
+
+async function hashPassword(pw){
+  const enc = new TextEncoder().encode(pw);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function init(){
+  try{
+    const profile = await window.storage.get('profile', false);
+    if(profile && profile.value){
+      const data = JSON.parse(profile.value);
+      myUsername = data.username;
+    }
+  }catch(e){ /* no saved session */ }
+
+  if(myUsername){
+    await loadMyEntry();
+    showUserView();
+  }else{
+    showGate();
+  }
+}
+
+function showGate(){
+  authGate.style.display = 'block';
+  adminGate.style.display = 'none';
+  mainArea.style.display = 'none';
+  adminPanel.style.display = 'none';
+  overview.style.display = 'none';
+  modeTag.style.display = 'none';
+  signupError.textContent = '';
+  loginError.textContent = '';
+  signupUser.value = ''; signupPass.value = ''; signupPassConfirm.value = '';
+  loginUser.value = ''; loginPass.value = '';
+  if(pollTimer) clearInterval(pollTimer);
+}
+
+function setTab(tab){
+  if(tab === 'signup'){
+    tabSignupBtn.classList.add('active');
+    tabLoginBtn.classList.remove('active');
+    signupForm.style.display = 'block';
+    loginForm.style.display = 'none';
+  }else{
+    tabLoginBtn.classList.add('active');
+    tabSignupBtn.classList.remove('active');
+    loginForm.style.display = 'block';
+    signupForm.style.display = 'none';
+  }
+}
+tabSignupBtn.addEventListener('click', () => setTab('signup'));
+tabLoginBtn.addEventListener('click', () => setTab('login'));
+
+showAdminLoginBtn.addEventListener('click', () => {
+  authGate.style.display = 'none';
+  adminGate.style.display = 'block';
+  adminError.textContent = '';
+  adminPassInput.value = '';
+  adminPassInput.focus();
+});
+backToLoginBtn.addEventListener('click', () => {
+  adminGate.style.display = 'none';
+  authGate.style.display = 'block';
+});
+adminPassInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') adminLoginBtn.click(); });
+adminLoginBtn.addEventListener('click', () => {
+  if(adminPassInput.value === ADMIN_PASSCODE){
+    isAdmin = true;
+    showAdminView();
+  }else{
+    adminError.textContent = "That passcode isn't right.";
+  }
+});
+adminLogoutBtn.addEventListener('click', () => {
+  isAdmin = false;
+  showGate();
+  setTab('login');
+});
+logoutBtn.addEventListener('click', async () => {
+  myUsername = null;
+  try{ await window.storage.delete('profile', false); }catch(e){ /* ignore */ }
+  showGate();
+  setTab('login');
+});
+
+async function finishAuth(username){
+  myUsername = username;
+  try{
+    await window.storage.set('profile', JSON.stringify({username: myUsername}), false);
+  }catch(e){ /* continue even if personal save fails */ }
+  await loadMyEntry();
+  showUserView();
+}
+
+signupPassConfirm.addEventListener('keydown', (e) => { if(e.key === 'Enter') signupBtn.click(); });
+
+signupBtn.addEventListener('click', async () => {
+  const username = signupUser.value.trim();
+  const password = signupPass.value;
+  const confirm = signupPassConfirm.value;
+  signupError.textContent = '';
+
+  if(!username || !password){
+    signupError.textContent = 'Enter a username and a password.';
+    return;
+  }
+  if(username.toLowerCase() === 'admin'){
+    signupError.textContent = "That username is reserved — use the admin link below instead.";
+    return;
+  }
+  if(password.length < 4){
+    signupError.textContent = 'Password should be at least 4 characters.';
+    return;
+  }
+  if(password !== confirm){
+    signupError.textContent = "Passwords don't match.";
+    return;
+  }
+
+  signupBtn.disabled = true;
+  signupBtn.textContent = 'Creating…';
+  try{
+    let existing = null;
+    try{
+      const res = await window.storage.get(accountKey(username), true);
+      if(res && res.value) existing = JSON.parse(res.value);
+    }catch(e){ existing = null; }
+
+    if(existing){
+      signupError.textContent = 'That username is already taken — try logging in instead.';
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create account';
+      return;
+    }
+
+    const pwHash = await hashPassword(password);
+    const created = await window.storage.set(accountKey(username), JSON.stringify({
+      username, passHash: pwHash, createdAt: Date.now()
+    }), true);
+    if(!created){
+      signupError.textContent = "Couldn't create your account — try again.";
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create account';
+      return;
+    }
+
+    // initialize an empty tracker entry right away so the account has data from the start
+    const initialPayload = {
+      name: username,
+      days: Array(TOTAL_TASKS).fill(false),
+      notes: Array(TOTAL_TASKS).fill(''),
+      updatedAt: Date.now()
+    };
+    await window.storage.set(trackerKey(username), JSON.stringify(initialPayload), true);
+
+    await finishAuth(username);
+  }catch(e){
+    signupError.textContent = 'Something went wrong — try again.';
+  }
+  signupBtn.disabled = false;
+  signupBtn.textContent = 'Create account';
+});
+
+loginPass.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginBtn.click(); });
+
+loginBtn.addEventListener('click', async () => {
+  const username = loginUser.value.trim();
+  const password = loginPass.value;
+  loginError.textContent = '';
+
+  if(!username || !password){
+    loginError.textContent = 'Enter both a username and a password.';
+    return;
+  }
+  if(username.toLowerCase() === 'admin'){
+    loginError.textContent = "That username is reserved — use the admin link below instead.";
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Checking…';
+  try{
+    let existing = null;
+    try{
+      const res = await window.storage.get(accountKey(username), true);
+      if(res && res.value) existing = JSON.parse(res.value);
+    }catch(e){ existing = null; }
+
+    if(!existing){
+      loginError.textContent = "No account found for that username — sign up first.";
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Log in';
+      return;
+    }
+
+    const pwHash = await hashPassword(password);
+    if(existing.passHash !== pwHash){
+      loginError.textContent = 'Incorrect password.';
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Log in';
+      return;
+    }
+
+    await finishAuth(username);
+  }catch(e){
+    loginError.textContent = 'Something went wrong — try again.';
+  }
+  loginBtn.disabled = false;
+  loginBtn.textContent = 'Log in';
+});
+
+async function loadMyEntry(){
+  try{
+    const res = await window.storage.get(trackerKey(myUsername), true);
+    if(res && res.value){
+      const data = JSON.parse(res.value);
+      myDays = data.days || Array(TOTAL_TASKS).fill(false);
+      myNotes = data.notes || Array(TOTAL_TASKS).fill('');
+    }else{
+      myDays = Array(TOTAL_TASKS).fill(false);
+      myNotes = Array(TOTAL_TASKS).fill('');
+    }
+  }catch(e){
+    myDays = Array(TOTAL_TASKS).fill(false);
+    myNotes = Array(TOTAL_TASKS).fill('');
+  }
+}
+
+function showUserView(){
+  authGate.style.display = 'none';
+  adminGate.style.display = 'none';
+  adminPanel.style.display = 'none';
+  mainArea.style.display = 'grid';
+  overview.style.display = 'grid';
+  modeTag.style.display = 'none';
+  tagline.textContent = "Work through your checklist below — your progress shows up on the camp board and to the admin, live.";
+  whoAmI.textContent = myUsername;
+  renderTrail();
+  refreshData();
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(refreshData, 5000);
+}
+
+function showAdminView(){
+  authGate.style.display = 'none';
+  adminGate.style.display = 'none';
+  mainArea.style.display = 'none';
+  adminPanel.style.display = 'block';
+  overview.style.display = 'grid';
+  modeTag.style.display = 'inline-block';
+  modeTag.textContent = 'Admin view — read only';
+  modeTag.className = 'mode-tag admin';
+  tagline.textContent = "Camp office — everyone's task progress, updated live. View only.";
+  refreshData();
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(refreshData, 5000);
+}
+
+function renderTrail(){
+  trailList.innerHTML = '';
+  const doneTotal = myDays.filter(Boolean).length;
+  doneCountEl.textContent = doneTotal;
+
+  for(let i=0;i<TOTAL_TASKS;i++){
+    const row = document.createElement('div');
+    row.className = 'checkpoint';
+
+    const markerCol = document.createElement('div');
+    markerCol.className = 'marker-col';
+    const marker = document.createElement('button');
+    marker.className = 'marker' + (myDays[i] ? ' done' : '');
+    marker.textContent = i+1;
+    marker.setAttribute('aria-label', TASKS[i] + (myDays[i] ? ', complete' : ', not complete'));
+    marker.addEventListener('click', () => toggleTask(i));
+    const stem = document.createElement('div');
+    stem.className = 'stem';
+    markerCol.appendChild(marker);
+    markerCol.appendChild(stem);
+
+    const body = document.createElement('div');
+    body.className = 'checkpoint-body';
+    const label = document.createElement('div');
+    label.className = 'day-label' + (myDays[i] ? ' done-label' : '');
+    label.textContent = TASKS[i];
+    const note = document.createElement('input');
+    note.type = 'text';
+    note.className = 'note';
+    note.maxLength = 80;
+    note.placeholder = 'Add a note (optional)';
+    note.value = myNotes[i] || '';
+    note.addEventListener('input', () => {
+      myNotes[i] = note.value;
+      queueSave();
+    });
+    body.appendChild(label);
+    body.appendChild(note);
+
+    row.appendChild(markerCol);
+    row.appendChild(body);
+    trailList.appendChild(row);
+  }
+}
+
+function toggleTask(i){
+  myDays[i] = !myDays[i];
+  renderTrail();
+  queueSave();
+}
+
+let saveDebounce = null;
+function queueSave(){
+  saveStatus.textContent = 'Saving…';
+  if(saveDebounce) clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(saveMyEntry, 500);
+}
+
+async function saveMyEntry(){
+  try{
+    const payload = {
+      name: myUsername,
+      days: myDays,
+      notes: myNotes,
+      updatedAt: Date.now()
+    };
+    const result = await window.storage.set(trackerKey(myUsername), JSON.stringify(payload), true);
+    if(result){
+      saveStatus.textContent = 'Saved just now';
+      setTimeout(() => { if(saveStatus.textContent === 'Saved just now') saveStatus.textContent = ''; }, 2000);
+      refreshData();
+    }else{
+      saveStatus.textContent = "Couldn't save — try again";
+    }
+  }catch(e){
+    saveStatus.textContent = "Couldn't save — try again";
+  }
+}
+
+resetBtn.addEventListener('click', async () => {
+  myDays = Array(TOTAL_TASKS).fill(false);
+  myNotes = Array(TOTAL_TASKS).fill('');
+  renderTrail();
+  await saveMyEntry();
+});
+
+async function fetchAllEntries(){
+  const list = await window.storage.list('tracker:', true);
+  if(!list || !list.keys || list.keys.length === 0) return [];
+  const entries = [];
+  for(const k of list.keys){
+    try{
+      const res = await window.storage.get(k, true);
+      if(res && res.value) entries.push(JSON.parse(res.value));
+    }catch(e){ /* skip unreadable entry */ }
+  }
+  entries.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+  return entries;
+}
+
+async function refreshData(){
+  let entries = [];
+  try{
+    entries = await fetchAllEntries();
+  }catch(e){
+    if(!isAdmin) board.innerHTML = '<div class="board-msg">Couldn\'t load the camp board right now.</div>';
+    else roster.innerHTML = '<div class="board-msg">Couldn\'t load the roster right now.</div>';
+    return;
+  }
+  renderOverview(entries);
+  if(isAdmin){
+    renderRoster(entries);
+  }else{
+    renderBoard(entries);
+  }
+}
+
+function renderOverview(entries){
+  const count = entries.length;
+  document.getElementById('ovCount').textContent = count;
+  if(count === 0){
+    document.getElementById('ovAvg').textContent = '—';
+    document.getElementById('ovLeader').textContent = '—';
+    document.getElementById('ovLast').textContent = '—';
+    return;
+  }
+  let totalDone = 0, maxDone = -1, leader = '', lastTs = 0;
+  for(const e of entries){
+    const done = (e.days||[]).filter(Boolean).length;
+    totalDone += done;
+    if(done > maxDone){ maxDone = done; leader = e.name; }
+    if((e.updatedAt||0) > lastTs) lastTs = e.updatedAt||0;
+  }
+  const avgPct = Math.round((totalDone / (count*TOTAL_TASKS)) * 100);
+  document.getElementById('ovAvg').textContent = avgPct + '%';
+  document.getElementById('ovLeader').textContent = leader + ' (' + maxDone + '/' + TOTAL_TASKS + ')';
+  document.getElementById('ovLast').textContent = timeAgo(lastTs);
+}
+
+function renderBoard(entries){
+  board.innerHTML = '';
+  if(entries.length === 0){
+    board.innerHTML = '<div class="empty-board">No one else has started yet — be the first mark on the board.</div>';
+    return;
+  }
+  for(const entry of entries){
+    const row = document.createElement('div');
+    row.className = 'hiker-row';
+
+    const top = document.createElement('div');
+    top.className = 'hiker-top';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'hiker-name';
+    const isYou = myUsername && entry.name && entry.name.trim().toLowerCase() === myUsername.trim().toLowerCase();
+    nameEl.textContent = entry.name + ' ';
+    if(isYou){
+      const tag = document.createElement('span');
+      tag.className = 'you-tag';
+      tag.textContent = '(you)';
+      nameEl.appendChild(tag);
+    }
+    const updated = document.createElement('div');
+    updated.className = 'hiker-updated';
+    updated.textContent = timeAgo(entry.updatedAt);
+    top.appendChild(nameEl);
+    top.appendChild(updated);
+
+    const mini = document.createElement('div');
+    mini.className = 'mini-trail';
+    const days = entry.days || Array(TOTAL_TASKS).fill(false);
+    days.forEach(d => {
+      const dot = document.createElement('div');
+      dot.className = 'mini-dot' + (d ? ' done' : '');
+      mini.appendChild(dot);
+    });
+
+    row.appendChild(top);
+    row.appendChild(mini);
+
+    const notes = entry.notes || [];
+    const lastNoteIdx = [...notes].reverse().findIndex(n => n && n.trim());
+    if(lastNoteIdx !== -1){
+      const realIdx = notes.length - 1 - lastNoteIdx;
+      const noteEl = document.createElement('p');
+      noteEl.className = 'hiker-note';
+      noteEl.textContent = '"' + notes[realIdx] + '" — ' + (TASKS[realIdx] || 'task ' + (realIdx+1));
+      row.appendChild(noteEl);
+    }
+
+    board.appendChild(row);
+  }
+}
+
+function renderRoster(entries){
+  roster.innerHTML = '';
+  if(entries.length === 0){
+    roster.innerHTML = '<div class="empty-board">No one has started yet.</div>';
+    return;
+  }
+  for(const entry of entries){
+    const done = (entry.days||[]).filter(Boolean).length;
+    const row = document.createElement('div');
+    row.className = 'roster-row';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'roster-name';
+    nameEl.textContent = entry.name;
+
+    const mini = document.createElement('div');
+    mini.className = 'mini-trail';
+    const days = entry.days || Array(TOTAL_TASKS).fill(false);
+    days.forEach((d, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'mini-dot' + (d ? ' done' : '');
+      dot.title = TASKS[idx];
+      mini.appendChild(dot);
+    });
+
+    const progressEl = document.createElement('div');
+    progressEl.className = 'roster-progress';
+    progressEl.textContent = done + '/' + TOTAL_TASKS + ' · ' + timeAgo(entry.updatedAt);
+
+    row.appendChild(nameEl);
+    row.appendChild(mini);
+    row.appendChild(progressEl);
+    roster.appendChild(row);
+  }
+}
+
+function timeAgo(ts){
+  if(!ts) return '—';
+  const diff = Math.max(0, Date.now() - ts);
+  const mins = Math.floor(diff/60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs/24);
+  return days + 'd ago';
+}
+
+init();
+</script>
+</body>
+</html>
