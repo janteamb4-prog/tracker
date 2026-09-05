@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trail — Task Tracker</title>
+<title>Employee Tracker — Task Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -406,6 +406,148 @@
   }
   .roster-name { font-weight: 600; font-size: 0.9rem; }
   .roster-progress { font-size: 0.8rem; color: var(--teal); font-weight: 600; }
+
+.status-select{
+background:var(--bg);
+color:var(--parchment);
+border:1px solid var(--line);
+padding:6px;
+border-radius:6px;
+}
+.admin-action{
+display:flex;
+gap:8px;
+margin-top:10px;
+}
+.danger-btn{
+background:var(--miss)!important;
+color:white!important;
+}
+
+
+.admin-user-actions{
+display:flex;
+gap:8px;
+align-items:center;
+margin-top:8px;
+}
+.admin-small-btn{
+padding:6px 10px;
+font-size:12px;
+border-radius:6px;
+}
+.add-task-btn{
+background:var(--teal);
+color:white;
+}
+.delete-user-btn{
+background:var(--miss);
+color:white;
+}
+
+.status-box{
+padding:8px;
+border-top:1px solid var(--line);
+margin-top:8px;
+}
+.status-accomplished{color:#4A8B85;}
+.status-pending{color:#E3A857;}
+.status-progress{color:#8FA79D;}
+.admin-actions button{margin-right:5px;}
+
+.task-check{
+display:flex;
+align-items:center;
+gap:8px;
+margin-top:8px;
+}
+.task-check input{
+width:18px;
+height:18px;
+}
+.task-complete{
+color:var(--teal);
+font-weight:600;
+}
+
+.admin-day-select{
+background:var(--bg);
+color:var(--parchment);
+border:1px solid var(--line);
+border-radius:6px;
+padding:8px;
+margin-right:8px;
+}
+
+/* Glassmorphic UI Upgrade */
+:root{
+ --bg:#071c1a;
+ --panel:rgba(255,255,255,0.10);
+ --panel-raised:rgba(255,255,255,0.14);
+ --line:rgba(255,255,255,0.18);
+ --amber:#f3c46b;
+ --parchment:#f7f3e8;
+ --muted:rgba(247,243,232,0.65);
+}
+
+body{
+ background:
+ radial-gradient(circle at top left, rgba(74,139,133,.35), transparent 35%),
+ radial-gradient(circle at bottom right, rgba(227,168,87,.25), transparent 35%),
+ linear-gradient(135deg,#061513,#102c28);
+ backdrop-filter:blur(20px);
+}
+
+.panel,.card,.overview,.status-box{
+ background:rgba(255,255,255,0.10)!important;
+ border:1px solid rgba(255,255,255,0.22)!important;
+ box-shadow:
+ 0 20px 50px rgba(0,0,0,.35),
+ inset 0 1px 1px rgba(255,255,255,.2);
+ backdrop-filter:blur(18px);
+ -webkit-backdrop-filter:blur(18px);
+ border-radius:20px!important;
+}
+
+input,select{
+ background:rgba(0,0,0,.25)!important;
+ border:1px solid rgba(255,255,255,.25)!important;
+ color:white!important;
+ backdrop-filter:blur(10px);
+}
+
+button.primary{
+ background:linear-gradient(135deg,#f3c46b,#d99535)!important;
+ box-shadow:0 8px 20px rgba(227,168,87,.3);
+ border-radius:12px!important;
+}
+
+button.ghost,.danger-user{
+ background:rgba(255,255,255,.12)!important;
+ border:1px solid rgba(255,255,255,.2)!important;
+ backdrop-filter:blur(10px);
+ border-radius:12px!important;
+}
+
+.marker{
+ background:rgba(255,255,255,.12)!important;
+ backdrop-filter:blur(10px);
+}
+
+h1,h2{
+ text-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+
+.top:before{
+ content:"";
+ position:fixed;
+ width:300px;
+ height:300px;
+ background:rgba(227,168,87,.15);
+ filter:blur(90px);
+ z-index:-1;
+}
+
 </style>
 </head>
 <body>
@@ -413,14 +555,14 @@
 
   <header class="top">
     <div>
-      <h1>The <span>Task</span> Trail</h1>
+      <h1>Employee <span>Day 1 - Day 10</span> Tracker</h1>
       <p class="tagline" id="tagline">Sign up, work through your checklist, and your progress shows up live for the admin to see.</p>
     </div>
     <div id="modeTag" class="mode-tag" style="display:none;"></div>
   </header>
 
   <div id="overview" class="overview" style="display:none;">
-    <div class="stat"><div class="num" id="ovCount">0</div><div class="lbl">PEOPLE TRACKING</div></div>
+    <div class="stat"><div class="num" id="ovCount">0</div><div class="lbl">EMPLOYEES</div></div>
     <div class="stat"><div class="num" id="ovAvg">0%</div><div class="lbl">AVERAGE PROGRESS</div></div>
     <div class="stat"><div class="num" id="ovLeader">—</div><div class="lbl">FURTHEST ALONG</div></div>
     <div class="stat"><div class="num" id="ovLast">—</div><div class="lbl">LAST CHECK-IN</div></div>
@@ -462,7 +604,7 @@
   <div id="adminGate" class="panel auth-entry" style="display:none;">
     <button class="back-link" id="backToLoginBtn">&larr; Back</button>
     <h2>Admin access</h2>
-    <p class="sub">Enter the admin passcode to view everyone's progress. This account can only view — it can't change anyone's tasks.</p>
+    <p class="sub">Admin access — manage employees, assign tasks, and view all employee progress.</p>
     <label for="adminPassInput">Passcode</label>
     <input id="adminPassInput" type="password"/>
     <div><button class="primary" id="adminLoginBtn">Enter camp office</button></div>
@@ -474,12 +616,16 @@
     <section class="panel">
       <div class="trail-header-row">
         <div>
-          <h2>Your tasks</h2>
+          <h2>Employee Task Tracker</h2>
           <p class="sub" style="margin-bottom:0;">Check off each task as you finish it. Add a note if you like.</p>
         </div>
         <div class="streak-count"><span id="doneCount">0</span><small>/10 DONE</small></div>
       </div>
-      <div id="trailList" style="margin-top:16px;"></div>
+      <div id="assignedTasksBox" class="status-box">
+<h3>Assigned Tasks</h3>
+<div id="assignedTasksList">No assigned tasks</div>
+</div>
+<div id="trailList" style="margin-top:16px;"></div>
       <div class="save-status" id="saveStatus"></div>
       <div class="footer-row">
         <span class="who">Logged in as <b id="whoAmI"></b></span>
@@ -499,11 +645,39 @@
   </div>
 
   <div id="adminPanel" class="admin-panel">
+<div id="adminTaskSummary" class="panel"><h2>Employee Task Status</h2><div id="employeeStatusList"></div></div>
+
+<div id="adminTaskControls" class="panel" style="margin-top:20px;">
+<h2>Assign Employee Task</h2>
+<p class="sub">Only admin can create tasks.</p>
+
+<label>Employee</label>
+<select id="adminEmployeeSelect"></select>
+
+<label>Task Name</label>
+<input id="adminTaskName" type="text" placeholder="Enter task">
+<select id="adminTaskDay">
+<option>Day 1</option>
+<option>Day 2</option>
+<option>Day 3</option>
+<option>Day 4</option>
+<option>Day 5</option>
+<option>Day 6</option>
+<option>Day 7</option>
+<option>Day 8</option>
+<option>Day 9</option>
+<option>Day 10</option>
+</select>
+
+<button class="primary" id="addEmployeeTaskBtn">Add Task</button>
+<button class="ghost" id="deleteEmployeeBtn">Delete User</button>
+</div>
+
     <section class="panel">
       <div class="trail-header-row">
         <div>
-          <h2>Everyone's progress</h2>
-          <p class="sub" style="margin-bottom:0;">View only — this account can't edit or reset anyone's tasks.</p>
+          <h2>Employee Progress Management</h2>
+          <p class="sub" style="margin-bottom:0;">Admin control panel — manage employees and assigned tasks.</p>
         </div>
         <button class="ghost" id="adminLogoutBtn">Log out</button>
       </div>
@@ -527,7 +701,7 @@ const TASKS = [
   "Celebrate today's progress"
 ];
 const TOTAL_TASKS = TASKS.length;
-const ADMIN_PASSCODE = "SUMMIT10";
+const ADMIN_PASSCODE = "admin1234";
 
 let myUsername = null;
 let myDays = Array(TOTAL_TASKS).fill(false);
@@ -807,6 +981,7 @@ async function loadMyEntry(){
 }
 
 function showUserView(){
+ setTimeout(renderAssignedTasks,300);
   authGate.style.display = 'none';
   adminGate.style.display = 'none';
   adminPanel.style.display = 'none';
@@ -815,13 +990,16 @@ function showUserView(){
   modeTag.style.display = 'none';
   tagline.textContent = "Work through your checklist below — your progress shows up on the camp board and to the admin, live.";
   whoAmI.textContent = myUsername;
-  renderTrail();
+  renderEmployeeTracker();
   refreshData();
   if(pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(refreshData, 5000);
 }
 
 function showAdminView(){
+ setTimeout(renderEmployeeStatus,500);
+ setTimeout(adminLoadEmployees,500);
+  setTimeout(adminLoadEmployees,300);
   authGate.style.display = 'none';
   adminGate.style.display = 'none';
   mainArea.style.display = 'none';
@@ -836,7 +1014,11 @@ function showAdminView(){
   pollTimer = setInterval(refreshData, 5000);
 }
 
-function renderTrail(){
+function renderEmployeeTracker(){
+ setTimeout(renderAssignedTasks,100);
+ // Display admin assigned tasks
+ const assigned = myDays;
+
   trailList.innerHTML = '';
   const doneTotal = myDays.filter(Boolean).length;
   doneCountEl.textContent = doneTotal;
@@ -883,7 +1065,7 @@ function renderTrail(){
 
 function toggleTask(i){
   myDays[i] = !myDays[i];
-  renderTrail();
+  renderEmployeeTracker();
   queueSave();
 }
 
@@ -918,7 +1100,7 @@ async function saveMyEntry(){
 resetBtn.addEventListener('click', async () => {
   myDays = Array(TOTAL_TASKS).fill(false);
   myNotes = Array(TOTAL_TASKS).fill('');
-  renderTrail();
+  renderEmployeeTracker();
   await saveMyEntry();
 });
 
@@ -1061,6 +1243,7 @@ function renderRoster(entries){
     row.appendChild(nameEl);
     row.appendChild(mini);
     row.appendChild(progressEl);
+     row.insertAdjacentHTML('beforeend', renderAdminEmployeeActions(entry));
     roster.appendChild(row);
   }
 }
@@ -1077,7 +1260,467 @@ function timeAgo(ts){
   return days + 'd ago';
 }
 
+
+// Browser storage compatibility layer
+// Keeps the original interface unchanged while enabling signup/login in normal browsers.
+if (!window.storage) {
+  window.storage = {
+    async get(key, shared=false) {
+      const value = localStorage.getItem((shared ? "shared:" : "private:") + key);
+      return value === null ? null : { value };
+    },
+    async set(key, value, shared=false) {
+      localStorage.setItem((shared ? "shared:" : "private:") + key, value);
+      return { value };
+    },
+    async delete(key, shared=false) {
+      localStorage.removeItem((shared ? "shared:" : "private:") + key);
+      return true;
+    },
+    async list(prefix, shared=false) {
+      const base = shared ? "shared:" : "private:";
+      const keys = [];
+      for (let i=0;i<localStorage.length;i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(base + prefix)) {
+          keys.push(k.replace(base, ""));
+        }
+      }
+      return { keys };
+    }
+  };
+}
+
+
+// Employee Task Tracker upgrades
+const TASK_STATUS = ["Pending","Accomplished","On Progress","Incomplete"];
+
+function getToday(){
+ return new Date().toLocaleDateString();
+}
+
+function saveEmployeeTask(employee, taskIndex, status){
+ let key = trackerKey(employee);
+ window.storage.get(key,true).then(res=>{
+   let data = res && res.value ? JSON.parse(res.value) : {
+    name:employee,tasks:[]
+   };
+   if(data.tasks){
+     data.tasks[taskIndex].status=status;
+     data.tasks[taskIndex].date=getToday();
+   }
+   window.storage.set(key,JSON.stringify(data),true);
+ });
+}
+
+// Admin task creation helper
+function createAdminTask(employee, title){
+ window.storage.get(trackerKey(employee),true).then(res=>{
+   let data=res && res.value ? JSON.parse(res.value):{name:employee,tasks:[]};
+   data.tasks=data.tasks||[];
+   data.tasks.push({
+     title:title,
+     status:"Pending",
+     date:getToday()
+   });
+   window.storage.set(trackerKey(employee),JSON.stringify(data),true);
+ });
+}
+
+// Employee privacy: only current user's tracker rendered.
+// Admin functions can access all shared tracker records.
+
+
+// Admin employee management extensions
+async function adminLoadEmployees(){
+    const list = await window.storage.list('tracker:', true);
+    const select = document.getElementById('adminEmployeeSelect');
+    if(!select) return;
+
+    select.innerHTML = "";
+
+    if(list && list.keys){
+        for(const key of list.keys){
+            const res = await window.storage.get(key,true);
+            if(res && res.value){
+                const emp = JSON.parse(res.value);
+                if(emp.name){
+                    select.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
+                }
+            }
+        }
+    }
+}
+
+async function adminAddTask(){
+    const employee = document.getElementById("adminEmployeeSelect").value;
+    const taskName = document.getElementById("adminTaskName").value.trim();
+    const daySelect = document.getElementById("adminTaskDay");
+    const day = daySelect ? daySelect.value : "Day 1";
+
+    if(!employee || !taskName){
+        alert("Please select employee and enter task.");
+        return;
+    }
+
+    const res = await window.storage.get(trackerKey(employee), true);
+
+    let data = res && res.value
+        ? JSON.parse(res.value)
+        : {name:employee,tasks:[]};
+
+    data.tasks = data.tasks || [];
+
+    data.tasks.push({
+        title: taskName,
+        day: day,
+        status: "Pending",
+        createdAt: Date.now()
+    });
+
+    data.updatedAt = Date.now();
+
+    await window.storage.set(
+        trackerKey(employee),
+        JSON.stringify(data),
+        true
+    );
+
+    document.getElementById("adminTaskName").value = "";
+
+    await refreshData();
+
+    if(typeof renderEmployeeStatus === "function"){
+        renderEmployeeStatus();
+    }
+}
+
+async function adminDeleteEmployee(username){
+    if(!confirm("Delete employee "+username+"?")) return;
+
+    await window.storage.delete(trackerKey(username),true);
+    await window.storage.delete(accountKey(username),true);
+
+    refreshData();
+    adminLoadEmployees();
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    const btn=document.getElementById("addEmployeeTaskBtn");
+    if(btn){
+        btn.addEventListener("click",adminAddTask);
+    }
+});
+
+
+let selectedEmployeeForTask="";
+
+function openTaskModal(employee){
+ selectedEmployeeForTask=employee;
+ document.getElementById("selectedEmployee").innerText="Assign task to: "+employee;
+ document.getElementById("taskModal").style.display="flex";
+}
+
+function closeTaskModal(){
+ document.getElementById("taskModal").style.display="none";
+}
+
+
+async function confirmAddTask(){
+    const task = document.getElementById("modalTaskName").value.trim();
+    const day = document.getElementById("taskDaySelect").value;
+
+    if(!task || !selectedEmployeeForTask){
+        alert("Please enter a task.");
+        return;
+    }
+
+    const res = await window.storage.get(trackerKey(selectedEmployeeForTask), true);
+
+    let employee = res && res.value 
+        ? JSON.parse(res.value)
+        : {name:selectedEmployeeForTask, tasks:[]};
+
+    if(!employee.tasks){
+        employee.tasks = [];
+    }
+
+    employee.tasks.push({
+        title: task,
+        day: day,
+        status: "Pending",
+        createdAt: Date.now()
+    });
+
+    employee.updatedAt = Date.now();
+
+    await window.storage.set(
+        trackerKey(selectedEmployeeForTask),
+        JSON.stringify(employee),
+        true
+    );
+
+    document.getElementById("modalTaskName").value="";
+    document.getElementById("taskDaySelect").value="Day 1";
+
+    closeTaskModal();
+
+    refreshData();
+    if(typeof renderAssignedTasks === "function") renderAssignedTasks();
+
+    if(typeof renderEmployeeStatus === "function"){
+        renderEmployeeStatus();
+    }
+}
+
+
+async function deleteEmployeeFull(name){
+ if(!confirm("Delete employee "+name+" permanently?")) return;
+
+ await window.storage.delete(trackerKey(name),true);
+ await window.storage.delete(accountKey(name),true);
+
+ refreshData();
+}
+
+
+
+
+async function renderEmployeeStatus(){
+ const list=document.getElementById("employeeStatusList");
+ if(!list) return;
+
+ list.innerHTML="";
+
+ const entries=await fetchAllEntries();
+
+ if(entries.length===0){
+   list.innerHTML="<p>No employees found.</p>";
+   return;
+ }
+
+ entries.forEach(emp=>{
+   let tasks=emp.tasks||[];
+
+   let accomplished=tasks.filter(t=>t.status==="Accomplished");
+   let pending=tasks.filter(t=>t.status==="Pending");
+   let progress=tasks.filter(t=>t.status==="On Progress");
+
+   list.innerHTML += `
+   <div class="status-box">
+   <b>Employee: ${emp.name}</b><br>
+   
+
+   <div class="status-accomplished">
+   Accomplished Task:
+   ${accomplished.length ? accomplished.map(t=>t.title).join(", ") : "None"}
+   </div>
+
+   <div class="status-pending">
+   Pending Task:
+   ${pending.length ? pending.map(t=>t.title).join(", ") : "None"}
+   </div>
+
+   <div class="status-progress">
+   On Progress Task:
+   ${progress.length ? progress.map(t=>t.title).join(", ") : "None"}
+   </div>
+
+   
+
+   </div>`;
+ });
+}
+
+async function refreshAdminData(){
+ await refreshData();
+ await renderEmployeeStatus();
+}
+
+
+
+
+async function renderAssignedTasks(){
+ const box=document.getElementById("assignedTasksList");
+ if(!box || !myUsername) return;
+
+ const res=await window.storage.get(trackerKey(myUsername),true);
+
+ if(!res || !res.value){
+   box.innerHTML="No assigned tasks";
+   return;
+ }
+
+ const data=JSON.parse(res.value);
+ const tasks=data.tasks||[];
+
+ if(tasks.length===0){
+   box.innerHTML="No assigned tasks";
+   return;
+ }
+
+ box.innerHTML=tasks.map((t,index)=>`
+ <div class="status-box">
+ <b>${t.day || ""} ${t.title}</b><br>
+
+ <div class="task-check">
+ <input type="checkbox"
+ ${t.status==="Accomplished" ? "checked" : ""}
+ onclick="completeAssignedTask(${index}, this.checked)">
+
+ <span class="${t.status==="Accomplished" ? "task-complete":""}">
+ ${t.status || "Pending"}
+ </span>
+
+ </div>
+ </div>
+ `).join("");
+}
+
+async function completeAssignedTask(index,checked){
+ const res=await window.storage.get(trackerKey(myUsername),true);
+ if(!res || !res.value) return;
+
+ const data=JSON.parse(res.value);
+
+ if(data.tasks && data.tasks[index]){
+   data.tasks[index].status=checked ? "Accomplished" : "Pending";
+   data.tasks[index].completedAt=checked ? Date.now() : null;
+   data.updatedAt=Date.now();
+ }
+
+ await window.storage.set(
+ trackerKey(myUsername),
+ JSON.stringify(data),
+ true
+ );
+
+ renderAssignedTasks();
+ refreshData();
+}
+
+
+
+
+async function adminDeleteSelectedEmployee(){
+ const select=document.getElementById("adminEmployeeSelect");
+ if(!select || !select.value) return;
+
+ const employee=select.value;
+
+ if(!confirm("Delete user "+employee+"?")) return;
+
+ await window.storage.delete(trackerKey(employee),true);
+ await window.storage.delete(accountKey(employee),true);
+
+ refreshData();
+ renderEmployeeStatus();
+ adminLoadEmployees();
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+ const del=document.getElementById("deleteEmployeeBtn");
+ if(del){
+   del.addEventListener("click",adminDeleteSelectedEmployee);
+ }
+});
+
+
+async function assignTaskFromPanel(){
+ const employee=document.getElementById("adminEmployeeSelect").value;
+ const task=document.getElementById("adminTaskName").value.trim();
+ const day=document.getElementById("taskDaySelect").value;
+
+ if(!employee || !task) return;
+
+ const res=await window.storage.get(trackerKey(employee),true);
+ let data=res && res.value ? JSON.parse(res.value) : {name:employee,tasks:[]};
+
+ data.tasks=data.tasks||[];
+ data.tasks.push({
+   title:task,
+   day:day,
+   status:"Pending",
+   createdAt:Date.now()
+ });
+
+ data.updatedAt=Date.now();
+
+ await window.storage.set(trackerKey(employee),JSON.stringify(data),true);
+
+ document.getElementById("adminTaskName").value="";
+ refreshData();
+}
+
+
+
+// REALTIME_SYNC
+// Sync employee/admin views every few seconds so new admin tasks appear automatically.
+function startRealtimeSync(){
+    setInterval(async ()=>{
+        try{
+            if(typeof refreshData === "function"){
+                await refreshData();
+            }
+            if(typeof renderAssignedTasks === "function" && myUsername){
+                await renderAssignedTasks();
+            }
+            if(typeof renderEmployeeStatus === "function"){
+                await renderEmployeeStatus();
+            }
+        }catch(e){}
+    },3000);
+}
+
+startRealtimeSync();
 init();
 </script>
+
+<div id="taskModal" style="display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;">
+<div class="panel" style="width:350px;">
+<h2>Add Task</h2>
+<p id="selectedEmployee"></p>
+<select id="adminTaskDaySelect">
+<option>Day 1</option>
+<option>Day 2</option>
+<option>Day 3</option>
+<option>Day 4</option>
+<option>Day 5</option>
+<option>Day 6</option>
+<option>Day 7</option>
+<option>Day 8</option>
+<option>Day 9</option>
+<option>Day 10</option>
+</select>
+<select id="taskDaySelect" class="admin-day-select">
+<option value="Day 1">Day 1</option>
+<option value="Day 2">Day 2</option>
+<option value="Day 3">Day 3</option>
+<option value="Day 4">Day 4</option>
+<option value="Day 5">Day 5</option>
+<option value="Day 6">Day 6</option>
+<option value="Day 7">Day 7</option>
+<option value="Day 8">Day 8</option>
+<option value="Day 9">Day 9</option>
+<option value="Day 10">Day 10</option>
+</select>
+<input id="modalTaskName" placeholder="Task name" style="width:100%;">
+<select id="modalTaskDay" style="width:100%;margin-top:10px;">
+<option value="Day 1">Day 1</option>
+<option value="Day 2">Day 2</option>
+<option value="Day 3">Day 3</option>
+<option value="Day 4">Day 4</option>
+<option value="Day 5">Day 5</option>
+<option value="Day 6">Day 6</option>
+<option value="Day 7">Day 7</option>
+<option value="Day 8">Day 8</option>
+<option value="Day 9">Day 9</option>
+<option value="Day 10">Day 10</option>
+</select>
+<button class="primary" onclick="confirmAddTask()">Add Task</button>
+<button class="ghost" onclick="closeTaskModal()">Cancel</button>
+</div>
+</div>
+
 </body>
 </html>
