@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Employee Tracker — Task Tracker</title>
+<title>Task Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #16241F;
-    --panel: #1F332C;
-    --panel-raised: #24392F;
-    --line: #33473F;
+    --bg: #14201C;
+    --panel: #1C2E28;
+    --panel-raised: #23392F;
+    --line: #314840;
     --amber: #E3A857;
     --amber-dim: #7A6238;
     --teal: #4A8B85;
+    --teal-dim: #2C4F49;
     --parchment: #EDE6D6;
     --muted: #8FA79D;
     --miss: #C97B6B;
@@ -31,523 +32,178 @@
     * { animation: none !important; transition: none !important; }
   }
 
-  .wrap {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
-  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
 
   header.top {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
   }
   h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 2.1rem;
-    letter-spacing: -0.01em;
-    margin: 0;
-    color: var(--parchment);
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 2rem;
+    letter-spacing: -0.01em; margin: 0; color: var(--parchment);
   }
   h1 span { color: var(--amber); }
-  .tagline {
-    color: var(--muted);
-    font-size: 0.92rem;
-    margin: 0;
-    max-width: 34ch;
-  }
+  .tagline { color: var(--muted); font-size: 0.92rem; margin: 0; max-width: 38ch; }
   .mode-tag {
-    font-size: 0.72rem;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 4px 10px;
-    white-space: nowrap;
+    font-size: 0.72rem; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 20px; padding: 4px 10px; white-space: nowrap;
   }
   .mode-tag.admin { color: var(--amber); border-color: var(--amber-dim); }
 
-  /* --- overview strip --- */
   .overview {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--line);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 22px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden; margin-bottom: 22px;
   }
   @media (max-width: 700px){ .overview { grid-template-columns: repeat(2, 1fr); } }
-  .stat {
-    background: var(--panel);
-    padding: 14px 16px;
-  }
-  .stat .num {
-    font-family: 'Fraunces', serif;
-    font-size: 1.5rem;
-    color: var(--amber);
-    line-height: 1.1;
-  }
-  .stat .lbl {
-    font-size: 0.72rem;
-    color: var(--muted);
-    margin-top: 3px;
-  }
+  .stat { background: var(--panel); padding: 14px 16px; }
+  .stat .num { font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--amber); line-height: 1.1; }
+  .stat .lbl { font-size: 0.7rem; color: var(--muted); margin-top: 3px; letter-spacing: 0.01em; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 22px;
-    align-items: start;
+  .layout {
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 22px; align-items: start;
   }
-  @media (max-width: 760px) {
-    .grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
 
   .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 20px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px;
   }
-  .panel h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 1.15rem;
-    margin: 0 0 4px;
-  }
-  .panel .sub {
-    color: var(--muted);
-    font-size: 0.82rem;
-    margin: 0 0 18px;
-  }
+  .panel h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.1rem; margin: 0 0 4px; }
+  .panel .sub { color: var(--muted); font-size: 0.82rem; margin: 0 0 16px; }
 
   /* --- auth --- */
   .auth-entry { max-width: 420px; }
-  .auth-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-  }
+  .auth-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
   .tab-btn {
-    flex: 1;
-    padding: 9px;
-    background: var(--panel-raised);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
+    flex: 1; padding: 9px; background: var(--panel-raised); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--muted); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
   }
-  .tab-btn.active {
-    background: var(--amber);
-    color: #21170A;
-    border-color: var(--amber);
-  }
+  .tab-btn.active { background: var(--amber); color: #21170A; border-color: var(--amber); }
   .tab-btn:focus-visible { outline: 2px solid var(--parchment); outline-offset: 2px; }
-  .auth-entry label {
-    font-size: 0.78rem;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 6px;
-    margin-top: 14px;
-  }
+  .auth-entry label { font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 6px; margin-top: 14px; }
   .auth-entry label:first-of-type { margin-top: 0; }
   .auth-entry input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 11px 12px;
-    color: var(--parchment);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 11px 12px; color: var(--parchment); font-family: 'Inter', sans-serif; font-size: 0.95rem;
   }
   .auth-entry input:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
   .auth-entry button.primary { margin-top: 18px; }
   .admin-link {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.78rem;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    margin-top: 18px;
-    display: inline-block;
+    background: none; border: none; color: var(--muted); font-size: 0.78rem;
+    text-decoration: underline; cursor: pointer; padding: 0; margin-top: 18px; display: inline-block;
   }
   .admin-link:hover { color: var(--parchment); }
-  .gate-error {
-    color: var(--miss);
-    font-size: 0.8rem;
-    margin-top: 10px;
-    min-height: 14px;
-  }
-  .gate-success {
-    color: var(--teal);
-    font-size: 0.8rem;
-    margin-top: 10px;
-    min-height: 14px;
-  }
+  .gate-error { color: var(--miss); font-size: 0.8rem; margin-top: 10px; min-height: 14px; }
   .back-link {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.78rem;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 14px;
-    display: inline-block;
+    background: none; border: none; color: var(--muted); font-size: 0.78rem;
+    text-decoration: underline; cursor: pointer; padding: 0; margin-bottom: 14px; display: inline-block;
   }
 
   button.primary {
-    background: var(--amber);
-    color: #21170A;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 0.88rem;
-    cursor: pointer;
+    background: var(--amber); color: #21170A; border: none; border-radius: 6px;
+    padding: 10px 16px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.88rem; cursor: pointer;
   }
   button.primary:hover { background: #edb669; }
   button.primary:disabled { opacity: 0.6; cursor: default; }
   button.primary:focus-visible { outline: 2px solid var(--parchment); outline-offset: 2px; }
 
   button.ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 6px 11px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.78rem;
-    cursor: pointer;
+    background: transparent; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 6px; padding: 6px 11px; font-family: 'Inter', sans-serif; font-size: 0.78rem; cursor: pointer;
   }
   button.ghost:hover { color: var(--parchment); border-color: var(--muted); }
+  button.ghost.danger:hover { color: var(--miss); border-color: var(--miss); }
   button.ghost:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
 
-  /* --- your tasks --- */
-  .trail-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-    gap: 10px;
+  /* --- add task --- */
+  .add-task-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .add-task-row input {
+    flex: 1; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 10px 12px; color: var(--parchment); font-family: 'Inter', sans-serif; font-size: 0.9rem;
   }
-  .streak-count {
-    font-family: 'Fraunces', serif;
-    font-size: 1.5rem;
-    color: var(--amber);
-  }
-  .streak-count small {
-    font-family: 'Inter', sans-serif;
-    color: var(--muted);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
+  .add-task-row input:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
 
-  .checkpoint {
-    display: flex;
-    gap: 14px;
-    position: relative;
-    padding-bottom: 14px;
+  /* --- kanban --- */
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 640px) { .kanban { grid-template-columns: 1fr; } }
+  .col { background: var(--panel-raised); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-height: 80px; }
+  .col-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.78rem; font-weight: 600; color: var(--muted); margin-bottom: 10px;
+    text-transform: none;
   }
-  .checkpoint:last-child .stem { display: none; }
-  .marker-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
+  .col-head .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .dot.todo { background: var(--muted); }
+  .dot.pending { background: var(--amber); }
+  .dot.completed { background: var(--teal); }
+  .col-count {
+    background: var(--bg); border-radius: 10px; padding: 1px 8px; font-size: 0.72rem; color: var(--parchment);
   }
-  .marker {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    border: 2px solid var(--line);
-    background: var(--panel-raised);
-    color: var(--muted);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  .task-card {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 9px 10px; margin-bottom: 8px;
   }
-  .marker:hover { transform: scale(1.06); }
-  .marker:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-  .marker.done {
-    background: var(--amber);
-    border-color: var(--amber);
-    color: #21170A;
+  .task-card:last-child { margin-bottom: 0; }
+  .task-title { font-size: 0.85rem; color: var(--parchment); margin-bottom: 8px; word-break: break-word; }
+  .task-card.completed .task-title { color: var(--muted); text-decoration: line-through; }
+  .task-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .task-actions select {
+    background: var(--panel-raised); color: var(--parchment); border: 1px solid var(--line);
+    border-radius: 5px; padding: 4px 6px; font-size: 0.75rem; font-family: 'Inter', sans-serif;
   }
-  .stem {
-    width: 2px;
-    flex: 1;
-    background: var(--line);
-    margin-top: 2px;
+  .task-actions button {
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    border-radius: 5px; padding: 4px 8px; font-size: 0.72rem; cursor: pointer; font-family: 'Inter', sans-serif;
   }
-  .marker.done + .stem { background: var(--amber-dim); }
-  .checkpoint-body { flex: 1; padding-top: 5px; }
-  .checkpoint-body .day-label {
-    font-size: 0.85rem;
-    color: var(--parchment);
-    margin-bottom: 5px;
-  }
-  .checkpoint-body .day-label.done-label { color: var(--muted); text-decoration: line-through; }
-  .checkpoint-body input.note {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    padding: 7px 9px;
-    color: var(--parchment);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.82rem;
-  }
-  .checkpoint-body input.note::placeholder { color: #566E64; }
-  .checkpoint-body input.note:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+  .task-actions button:hover { color: var(--miss); border-color: var(--miss); }
+  .col-empty { color: var(--muted); font-size: 0.78rem; padding: 6px 2px; }
 
-  .save-status {
-    font-size: 0.75rem;
-    color: var(--muted);
-    height: 16px;
-    margin-top: 10px;
-  }
+  .save-status { font-size: 0.75rem; color: var(--muted); height: 16px; margin-top: 14px; }
 
-  /* --- camp board (community) --- */
-  .hiker-row {
-    border-top: 1px solid var(--line);
-    padding: 13px 0;
-  }
-  .hiker-row:first-of-type { border-top: none; padding-top: 0; }
-  .hiker-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 7px;
-  }
-  .hiker-name {
-    font-weight: 600;
-    font-size: 0.92rem;
-    color: var(--parchment);
-  }
-  .hiker-name .you-tag {
-    color: var(--amber);
-    font-weight: 500;
-    font-size: 0.72rem;
-  }
-  .hiker-updated {
-    font-size: 0.7rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  .mini-trail {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 6px;
-  }
-  .mini-dot {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--panel-raised);
-    border: 1px solid var(--line);
-    flex-shrink: 0;
-  }
-  .mini-dot.done { background: var(--teal); border-color: var(--teal); }
-  .hiker-note {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-style: italic;
-    margin: 0;
-  }
-
-  .empty-board, .board-msg {
-    color: var(--muted);
-    font-size: 0.85rem;
-    padding: 8px 0;
-  }
-
-  .footer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 22px;
-    gap: 8px;
-  }
-  .footer-row .who {
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; }
+  .footer-row .who { font-size: 0.78rem; color: var(--muted); }
   .footer-row .who b { color: var(--parchment); }
   .footer-row .actions { display: flex; gap: 8px; }
 
-  /* --- admin (read-only) --- */
+  /* --- team overview (employee-facing, read-only) --- */
+  .member-row { border-top: 1px solid var(--line); padding: 12px 0; }
+  .member-row:first-of-type { border-top: none; padding-top: 0; }
+  .member-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .member-name { font-weight: 600; font-size: 0.9rem; }
+  .member-name .you-tag { color: var(--amber); font-weight: 500; font-size: 0.72rem; }
+  .member-updated { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+  .member-counts { font-size: 0.78rem; color: var(--muted); }
+  .member-counts b { color: var(--teal); }
+  .empty-msg, .board-msg { color: var(--muted); font-size: 0.85rem; padding: 8px 0; }
+
+  /* --- admin roster --- */
   .admin-panel { display: none; }
-  .roster-row {
-    display: grid;
-    grid-template-columns: 1.1fr 1.6fr 0.9fr;
-    gap: 14px;
-    align-items: center;
-    border-top: 1px solid var(--line);
-    padding: 13px 0;
-  }
+  .roster-row { border-top: 1px solid var(--line); padding: 14px 0; }
   .roster-row:first-of-type { border-top: none; padding-top: 0; }
-  @media (max-width: 640px){
-    .roster-row { grid-template-columns: 1fr; gap: 6px; }
+  .roster-top {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
   }
   .roster-name { font-weight: 600; font-size: 0.9rem; }
-  .roster-progress { font-size: 0.8rem; color: var(--teal); font-weight: 600; }
-
-.status-select{
-background:var(--bg);
-color:var(--parchment);
-border:1px solid var(--line);
-padding:6px;
-border-radius:6px;
-}
-.admin-action{
-display:flex;
-gap:8px;
-margin-top:10px;
-}
-.danger-btn{
-background:var(--miss)!important;
-color:white!important;
-}
-
-
-.admin-user-actions{
-display:flex;
-gap:8px;
-align-items:center;
-margin-top:8px;
-}
-.admin-small-btn{
-padding:6px 10px;
-font-size:12px;
-border-radius:6px;
-}
-.add-task-btn{
-background:var(--teal);
-color:white;
-}
-.delete-user-btn{
-background:var(--miss);
-color:white;
-}
-
-.status-box{
-padding:8px;
-border-top:1px solid var(--line);
-margin-top:8px;
-}
-.status-accomplished{color:#4A8B85;}
-.status-pending{color:#E3A857;}
-.status-progress{color:#8FA79D;}
-.admin-actions button{margin-right:5px;}
-
-.task-check{
-display:flex;
-align-items:center;
-gap:8px;
-margin-top:8px;
-}
-.task-check input{
-width:18px;
-height:18px;
-}
-.task-complete{
-color:var(--teal);
-font-weight:600;
-}
-
-.admin-day-select{
-background:var(--bg);
-color:var(--parchment);
-border:1px solid var(--line);
-border-radius:6px;
-padding:8px;
-margin-right:8px;
-}
-
-/* Glassmorphic UI Upgrade */
-:root{
- --bg:#071c1a;
- --panel:rgba(255,255,255,0.10);
- --panel-raised:rgba(255,255,255,0.14);
- --line:rgba(255,255,255,0.18);
- --amber:#f3c46b;
- --parchment:#f7f3e8;
- --muted:rgba(247,243,232,0.65);
-}
-
-body{
- background:
- radial-gradient(circle at top left, rgba(74,139,133,.35), transparent 35%),
- radial-gradient(circle at bottom right, rgba(227,168,87,.25), transparent 35%),
- linear-gradient(135deg,#061513,#102c28);
- backdrop-filter:blur(20px);
-}
-
-.panel,.card,.overview,.status-box{
- background:rgba(255,255,255,0.10)!important;
- border:1px solid rgba(255,255,255,0.22)!important;
- box-shadow:
- 0 20px 50px rgba(0,0,0,.35),
- inset 0 1px 1px rgba(255,255,255,.2);
- backdrop-filter:blur(18px);
- -webkit-backdrop-filter:blur(18px);
- border-radius:20px!important;
-}
-
-input,select{
- background:rgba(0,0,0,.25)!important;
- border:1px solid rgba(255,255,255,.25)!important;
- color:white!important;
- backdrop-filter:blur(10px);
-}
-
-button.primary{
- background:linear-gradient(135deg,#f3c46b,#d99535)!important;
- box-shadow:0 8px 20px rgba(227,168,87,.3);
- border-radius:12px!important;
-}
-
-button.ghost,.danger-user{
- background:rgba(255,255,255,.12)!important;
- border:1px solid rgba(255,255,255,.2)!important;
- backdrop-filter:blur(10px);
- border-radius:12px!important;
-}
-
-.marker{
- background:rgba(255,255,255,.12)!important;
- backdrop-filter:blur(10px);
-}
-
-h1,h2{
- text-shadow:0 4px 20px rgba(0,0,0,.4);
-}
-
-.top:before{
- content:"";
- position:fixed;
- width:300px;
- height:300px;
- background:rgba(227,168,87,.15);
- filter:blur(90px);
- z-index:-1;
-}
-
+  .roster-counts { font-size: 0.78rem; color: var(--muted); }
+  .roster-counts b.c-todo { color: var(--muted); }
+  .roster-counts b.c-pending { color: var(--amber); }
+  .roster-counts b.c-completed { color: var(--teal); }
+  .roster-updated { font-size: 0.7rem; color: var(--muted); }
+  .roster-btns { display: flex; gap: 6px; }
+  .roster-detail { margin-top: 10px; padding-left: 2px; }
+  .roster-detail .task-line {
+    font-size: 0.8rem; color: var(--parchment); padding: 4px 0; border-bottom: 1px dashed var(--line);
+    display: flex; justify-content: space-between; gap: 10px;
+  }
+  .roster-detail .task-line:last-child { border-bottom: none; }
+  .roster-detail .status-pill {
+    font-size: 0.68rem; padding: 2px 7px; border-radius: 10px; white-space: nowrap;
+  }
+  .status-pill.todo { background: var(--panel-raised); color: var(--muted); }
+  .status-pill.pending { background: var(--amber-dim); color: var(--amber); }
+  .status-pill.completed { background: var(--teal-dim); color: var(--teal); }
 </style>
 </head>
 <body>
@@ -555,17 +211,17 @@ h1,h2{
 
   <header class="top">
     <div>
-      <h1>Employee <span>Day 1 - Day 10</span> Tracker</h1>
-      <p class="tagline" id="tagline">Sign up, work through your checklist, and your progress shows up live for the admin to see.</p>
+      <h1>Task <span>Board</span></h1>
+      <p class="tagline" id="tagline">Sign in, manage your tasks, and progress updates live for your manager.</p>
     </div>
     <div id="modeTag" class="mode-tag" style="display:none;"></div>
   </header>
 
   <div id="overview" class="overview" style="display:none;">
-    <div class="stat"><div class="num" id="ovCount">0</div><div class="lbl">EMPLOYEES</div></div>
-    <div class="stat"><div class="num" id="ovAvg">0%</div><div class="lbl">AVERAGE PROGRESS</div></div>
-    <div class="stat"><div class="num" id="ovLeader">—</div><div class="lbl">FURTHEST ALONG</div></div>
-    <div class="stat"><div class="num" id="ovLast">—</div><div class="lbl">LAST CHECK-IN</div></div>
+    <div class="stat"><div class="num" id="ovEmployees">0</div><div class="lbl">EMPLOYEES TRACKED</div></div>
+    <div class="stat"><div class="num" id="ovCompleted">0</div><div class="lbl">TASKS COMPLETED</div></div>
+    <div class="stat"><div class="num" id="ovInProgress">0</div><div class="lbl">TASKS IN PROGRESS</div></div>
+    <div class="stat"><div class="num" id="ovRate">0%</div><div class="lbl">COMPLETION RATE</div></div>
   </div>
 
   <div id="authGate" class="panel auth-entry">
@@ -576,7 +232,7 @@ h1,h2{
 
     <div id="signupForm">
       <h2>Create your account</h2>
-      <p class="sub">First time here? Set a username and password — this is what saves your progress.</p>
+      <p class="sub">New employee? Set a username and password to start tracking your tasks.</p>
       <label for="signupUser">Username</label>
       <input id="signupUser" type="text" maxlength="24" autocomplete="username"/>
       <label for="signupPass">Password</label>
@@ -604,80 +260,62 @@ h1,h2{
   <div id="adminGate" class="panel auth-entry" style="display:none;">
     <button class="back-link" id="backToLoginBtn">&larr; Back</button>
     <h2>Admin access</h2>
-    <p class="sub">Admin access — manage employees, assign tasks, and view all employee progress.</p>
+    <p class="sub">View every employee's tasks and remove an employee's account. This admin account can't edit or add anyone's individual tasks.</p>
     <label for="adminPassInput">Passcode</label>
     <input id="adminPassInput" type="password"/>
-    <div><button class="primary" id="adminLoginBtn">Enter camp office</button></div>
+    <div><button class="primary" id="adminLoginBtn">Enter admin view</button></div>
     <div class="gate-error" id="adminError"></div>
   </div>
 
-  <div id="mainArea" class="grid" style="display:none;">
+  <div id="mainArea" class="layout" style="display:none;">
 
     <section class="panel">
-      <div class="trail-header-row">
-        <div>
-          <h2>Employee Task Tracker</h2>
-          <p class="sub" style="margin-bottom:0;">Check off each task as you finish it. Add a note if you like.</p>
-        </div>
-        <div class="streak-count"><span id="doneCount">0</span><small>/10 DONE</small></div>
+      <h2>My tasks</h2>
+      <p class="sub">Add a task, then move it through To do, Pending, and Completed as you work.</p>
+
+      <div class="add-task-row">
+        <input id="newTaskInput" type="text" maxlength="80" placeholder="Add a new task…"/>
+        <button class="primary" id="addTaskBtn">Add</button>
       </div>
-      <div id="assignedTasksBox" class="status-box">
-<h3>Assigned Tasks</h3>
-<div id="assignedTasksList">No assigned tasks</div>
-</div>
-<div id="trailList" style="margin-top:16px;"></div>
+
+      <div class="kanban">
+        <div class="col">
+          <div class="col-head"><span><span class="dot todo"></span>To do</span><span class="col-count" id="countTodo">0</span></div>
+          <div id="colTodo"></div>
+        </div>
+        <div class="col">
+          <div class="col-head"><span><span class="dot pending"></span>Pending</span><span class="col-count" id="countPending">0</span></div>
+          <div id="colPending"></div>
+        </div>
+        <div class="col">
+          <div class="col-head"><span><span class="dot completed"></span>Completed</span><span class="col-count" id="countCompleted">0</span></div>
+          <div id="colCompleted"></div>
+        </div>
+      </div>
+
       <div class="save-status" id="saveStatus"></div>
       <div class="footer-row">
         <span class="who">Logged in as <b id="whoAmI"></b></span>
         <div class="actions">
-          <button class="ghost" id="resetBtn">Reset my tasks</button>
           <button class="ghost" id="logoutBtn">Log out</button>
         </div>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Camp board</h2>
-      <p class="sub">Everyone currently working the checklist.</p>
-      <div id="board"><div class="board-msg">Loading camp board…</div></div>
+      <h2>Team overview</h2>
+      <p class="sub">Where everyone else stands right now.</p>
+      <div id="teamBoard"><div class="board-msg">Loading team overview…</div></div>
     </section>
 
   </div>
 
   <div id="adminPanel" class="admin-panel">
-<div id="adminTaskSummary" class="panel"><h2>Employee Task Status</h2><div id="employeeStatusList"></div></div>
-
-<div id="adminTaskControls" class="panel" style="margin-top:20px;">
-<h2>Assign Employee Task</h2>
-<p class="sub">Only admin can create tasks.</p>
-
-<label>Employee</label>
-<select id="adminEmployeeSelect"></select>
-
-<label>Task Name</label>
-<input id="adminTaskName" type="text" placeholder="Enter task">
-<select id="adminTaskDay">
-<option>Day 1</option>
-<option>Day 2</option>
-<option>Day 3</option>
-<option>Day 4</option>
-<option>Day 5</option>
-<option>Day 6</option>
-<option>Day 7</option>
-<option>Day 8</option>
-<option>Day 9</option>
-<option>Day 10</option>
-</select>
-
-<button class="primary" id="addEmployeeTaskBtn">Add Task</button>
-<button class="ghost" id="deleteEmployeeBtn">Delete User</button>
-</div>
-
     <section class="panel">
-      <div class="trail-header-row">
+      <div class="footer-row" style="margin-top:0;">
         <div>
-          <h2>Employee Progress Management</h2>
-          <p class="sub" style="margin-bottom:0;">Admin control panel — manage employees and assigned tasks.</p>
+          <h2 style="margin-bottom:2px;">All employees</h2>
+          <p class="sub" style="margin-bottom:0;">View only, except for removing an account entirely.</p>
         </div>
         <button class="ghost" id="adminLogoutBtn">Log out</button>
       </div>
@@ -688,26 +326,15 @@ h1,h2{
 </div>
 
 <script>
-const TASKS = [
-  "Set your main goal for today",
-  "Complete your top-priority task",
-  "Take a break away from screens",
-  "Note one obstacle you ran into",
-  "Do one small thing for your health",
-  "Check in with someone for accountability",
-  "Tidy up your workspace",
-  "Review what worked today",
-  "Plan tomorrow's first task",
-  "Celebrate today's progress"
-];
-const TOTAL_TASKS = TASKS.length;
-const ADMIN_PASSCODE = "admin1234";
+const ADMIN_PASSCODE = "SUMMIT10";
+const STATUS_LABELS = { todo: 'To do', pending: 'Pending', completed: 'Completed' };
 
 let myUsername = null;
-let myDays = Array(TOTAL_TASKS).fill(false);
-let myNotes = Array(TOTAL_TASKS).fill('');
+let myTasks = [];
 let pollTimer = null;
 let isAdmin = false;
+let confirmingDeleteUser = null;
+let expandedRosterUser = null;
 
 const authGate = document.getElementById('authGate');
 const adminGate = document.getElementById('adminGate');
@@ -741,22 +368,25 @@ const adminError = document.getElementById('adminError');
 const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 
-const trailList = document.getElementById('trailList');
-const doneCountEl = document.getElementById('doneCount');
+const newTaskInput = document.getElementById('newTaskInput');
+const addTaskBtn = document.getElementById('addTaskBtn');
+const colTodo = document.getElementById('colTodo');
+const colPending = document.getElementById('colPending');
+const colCompleted = document.getElementById('colCompleted');
 const saveStatus = document.getElementById('saveStatus');
 const whoAmI = document.getElementById('whoAmI');
-const board = document.getElementById('board');
+const teamBoard = document.getElementById('teamBoard');
 const roster = document.getElementById('roster');
-const resetBtn = document.getElementById('resetBtn');
 
-function trackerKey(u){ return 'tracker:' + u.trim().toLowerCase(); }
 function accountKey(u){ return 'account:' + u.trim().toLowerCase(); }
+function tasksKey(u){ return 'tasks:' + u.trim().toLowerCase(); }
 
 async function hashPassword(pw){
   const enc = new TextEncoder().encode(pw);
   const buf = await crypto.subtle.digest('SHA-256', enc);
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
+function makeId(){ return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
 async function init(){
   try{
@@ -768,7 +398,7 @@ async function init(){
   }catch(e){ /* no saved session */ }
 
   if(myUsername){
-    await loadMyEntry();
+    await loadMyTasks();
     showUserView();
   }else{
     showGate();
@@ -784,22 +414,18 @@ function showGate(){
   modeTag.style.display = 'none';
   signupError.textContent = '';
   loginError.textContent = '';
-  signupUser.value = ''; signupPass.value = ''; signupPassConfirm.value = '';
-  loginUser.value = ''; loginPass.value = '';
+  signupUser.value=''; signupPass.value=''; signupPassConfirm.value='';
+  loginUser.value=''; loginPass.value='';
   if(pollTimer) clearInterval(pollTimer);
 }
 
 function setTab(tab){
   if(tab === 'signup'){
-    tabSignupBtn.classList.add('active');
-    tabLoginBtn.classList.remove('active');
-    signupForm.style.display = 'block';
-    loginForm.style.display = 'none';
+    tabSignupBtn.classList.add('active'); tabLoginBtn.classList.remove('active');
+    signupForm.style.display = 'block'; loginForm.style.display = 'none';
   }else{
-    tabLoginBtn.classList.add('active');
-    tabSignupBtn.classList.remove('active');
-    loginForm.style.display = 'block';
-    signupForm.style.display = 'none';
+    tabLoginBtn.classList.add('active'); tabSignupBtn.classList.remove('active');
+    loginForm.style.display = 'block'; signupForm.style.display = 'none';
   }
 }
 tabSignupBtn.addEventListener('click', () => setTab('signup'));
@@ -827,6 +453,7 @@ adminLoginBtn.addEventListener('click', () => {
 });
 adminLogoutBtn.addEventListener('click', () => {
   isAdmin = false;
+  confirmingDeleteUser = null;
   showGate();
   setTab('login');
 });
@@ -842,37 +469,23 @@ async function finishAuth(username){
   try{
     await window.storage.set('profile', JSON.stringify({username: myUsername}), false);
   }catch(e){ /* continue even if personal save fails */ }
-  await loadMyEntry();
+  await loadMyTasks();
   showUserView();
 }
 
 signupPassConfirm.addEventListener('keydown', (e) => { if(e.key === 'Enter') signupBtn.click(); });
-
 signupBtn.addEventListener('click', async () => {
   const username = signupUser.value.trim();
   const password = signupPass.value;
   const confirm = signupPassConfirm.value;
   signupError.textContent = '';
 
-  if(!username || !password){
-    signupError.textContent = 'Enter a username and a password.';
-    return;
-  }
-  if(username.toLowerCase() === 'admin'){
-    signupError.textContent = "That username is reserved — use the admin link below instead.";
-    return;
-  }
-  if(password.length < 4){
-    signupError.textContent = 'Password should be at least 4 characters.';
-    return;
-  }
-  if(password !== confirm){
-    signupError.textContent = "Passwords don't match.";
-    return;
-  }
+  if(!username || !password){ signupError.textContent = 'Enter a username and a password.'; return; }
+  if(username.toLowerCase() === 'admin'){ signupError.textContent = "That username is reserved — use the admin link below instead."; return; }
+  if(password.length < 4){ signupError.textContent = 'Password should be at least 4 characters.'; return; }
+  if(password !== confirm){ signupError.textContent = "Passwords don't match."; return; }
 
-  signupBtn.disabled = true;
-  signupBtn.textContent = 'Creating…';
+  signupBtn.disabled = true; signupBtn.textContent = 'Creating…';
   try{
     let existing = null;
     try{
@@ -882,8 +495,7 @@ signupBtn.addEventListener('click', async () => {
 
     if(existing){
       signupError.textContent = 'That username is already taken — try logging in instead.';
-      signupBtn.disabled = false;
-      signupBtn.textContent = 'Create account';
+      signupBtn.disabled = false; signupBtn.textContent = 'Create account';
       return;
     }
 
@@ -893,46 +505,31 @@ signupBtn.addEventListener('click', async () => {
     }), true);
     if(!created){
       signupError.textContent = "Couldn't create your account — try again.";
-      signupBtn.disabled = false;
-      signupBtn.textContent = 'Create account';
+      signupBtn.disabled = false; signupBtn.textContent = 'Create account';
       return;
     }
 
-    // initialize an empty tracker entry right away so the account has data from the start
-    const initialPayload = {
-      name: username,
-      days: Array(TOTAL_TASKS).fill(false),
-      notes: Array(TOTAL_TASKS).fill(''),
-      updatedAt: Date.now()
-    };
-    await window.storage.set(trackerKey(username), JSON.stringify(initialPayload), true);
+    await window.storage.set(tasksKey(username), JSON.stringify({
+      name: username, tasks: [], updatedAt: Date.now()
+    }), true);
 
     await finishAuth(username);
   }catch(e){
     signupError.textContent = 'Something went wrong — try again.';
   }
-  signupBtn.disabled = false;
-  signupBtn.textContent = 'Create account';
+  signupBtn.disabled = false; signupBtn.textContent = 'Create account';
 });
 
 loginPass.addEventListener('keydown', (e) => { if(e.key === 'Enter') loginBtn.click(); });
-
 loginBtn.addEventListener('click', async () => {
   const username = loginUser.value.trim();
   const password = loginPass.value;
   loginError.textContent = '';
 
-  if(!username || !password){
-    loginError.textContent = 'Enter both a username and a password.';
-    return;
-  }
-  if(username.toLowerCase() === 'admin'){
-    loginError.textContent = "That username is reserved — use the admin link below instead.";
-    return;
-  }
+  if(!username || !password){ loginError.textContent = 'Enter both a username and a password.'; return; }
+  if(username.toLowerCase() === 'admin'){ loginError.textContent = "That username is reserved — use the admin link below instead."; return; }
 
-  loginBtn.disabled = true;
-  loginBtn.textContent = 'Checking…';
+  loginBtn.disabled = true; loginBtn.textContent = 'Checking…';
   try{
     let existing = null;
     try{
@@ -942,149 +539,145 @@ loginBtn.addEventListener('click', async () => {
 
     if(!existing){
       loginError.textContent = "No account found for that username — sign up first.";
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Log in';
+      loginBtn.disabled = false; loginBtn.textContent = 'Log in';
       return;
     }
-
     const pwHash = await hashPassword(password);
     if(existing.passHash !== pwHash){
       loginError.textContent = 'Incorrect password.';
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Log in';
+      loginBtn.disabled = false; loginBtn.textContent = 'Log in';
       return;
     }
-
     await finishAuth(username);
   }catch(e){
     loginError.textContent = 'Something went wrong — try again.';
   }
-  loginBtn.disabled = false;
-  loginBtn.textContent = 'Log in';
+  loginBtn.disabled = false; loginBtn.textContent = 'Log in';
 });
 
-async function loadMyEntry(){
+async function loadMyTasks(){
   try{
-    const res = await window.storage.get(trackerKey(myUsername), true);
+    const res = await window.storage.get(tasksKey(myUsername), true);
     if(res && res.value){
       const data = JSON.parse(res.value);
-      myDays = data.days || Array(TOTAL_TASKS).fill(false);
-      myNotes = data.notes || Array(TOTAL_TASKS).fill('');
+      myTasks = data.tasks || [];
     }else{
-      myDays = Array(TOTAL_TASKS).fill(false);
-      myNotes = Array(TOTAL_TASKS).fill('');
+      myTasks = [];
     }
-  }catch(e){
-    myDays = Array(TOTAL_TASKS).fill(false);
-    myNotes = Array(TOTAL_TASKS).fill('');
-  }
+  }catch(e){ myTasks = []; }
 }
 
 function showUserView(){
- setTimeout(renderAssignedTasks,300);
   authGate.style.display = 'none';
   adminGate.style.display = 'none';
   adminPanel.style.display = 'none';
   mainArea.style.display = 'grid';
   overview.style.display = 'grid';
   modeTag.style.display = 'none';
-  tagline.textContent = "Work through your checklist below — your progress shows up on the camp board and to the admin, live.";
+  tagline.textContent = "Manage your tasks below — your manager can see your progress live.";
   whoAmI.textContent = myUsername;
-  renderEmployeeTracker();
+  renderMyTasks();
   refreshData();
   if(pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(refreshData, 5000);
 }
 
 function showAdminView(){
- setTimeout(renderEmployeeStatus,500);
- setTimeout(adminLoadEmployees,500);
-  setTimeout(adminLoadEmployees,300);
   authGate.style.display = 'none';
   adminGate.style.display = 'none';
   mainArea.style.display = 'none';
   adminPanel.style.display = 'block';
   overview.style.display = 'grid';
   modeTag.style.display = 'inline-block';
-  modeTag.textContent = 'Admin view — read only';
+  modeTag.textContent = 'Admin view';
   modeTag.className = 'mode-tag admin';
-  tagline.textContent = "Camp office — everyone's task progress, updated live. View only.";
+  tagline.textContent = "Every employee's tasks, updated live. You can remove an account, not edit anyone's tasks.";
   refreshData();
   if(pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(refreshData, 5000);
 }
 
-function renderEmployeeTracker(){
- setTimeout(renderAssignedTasks,100);
- // Display admin assigned tasks
- const assigned = myDays;
+newTaskInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') addTaskBtn.click(); });
+addTaskBtn.addEventListener('click', () => {
+  const title = newTaskInput.value.trim();
+  if(!title) { newTaskInput.focus(); return; }
+  myTasks.push({ id: makeId(), title, status: 'todo', createdAt: Date.now(), updatedAt: Date.now() });
+  newTaskInput.value = '';
+  renderMyTasks();
+  saveMyTasks();
+});
 
-  trailList.innerHTML = '';
-  const doneTotal = myDays.filter(Boolean).length;
-  doneCountEl.textContent = doneTotal;
+function renderMyTasks(){
+  colTodo.innerHTML = ''; colPending.innerHTML = ''; colCompleted.innerHTML = '';
+  const groups = { todo: [], pending: [], completed: [] };
+  for(const t of myTasks) (groups[t.status] || groups.todo).push(t);
 
-  for(let i=0;i<TOTAL_TASKS;i++){
-    const row = document.createElement('div');
-    row.className = 'checkpoint';
+  document.getElementById('countTodo').textContent = groups.todo.length;
+  document.getElementById('countPending').textContent = groups.pending.length;
+  document.getElementById('countCompleted').textContent = groups.completed.length;
 
-    const markerCol = document.createElement('div');
-    markerCol.className = 'marker-col';
-    const marker = document.createElement('button');
-    marker.className = 'marker' + (myDays[i] ? ' done' : '');
-    marker.textContent = i+1;
-    marker.setAttribute('aria-label', TASKS[i] + (myDays[i] ? ', complete' : ', not complete'));
-    marker.addEventListener('click', () => toggleTask(i));
-    const stem = document.createElement('div');
-    stem.className = 'stem';
-    markerCol.appendChild(marker);
-    markerCol.appendChild(stem);
-
-    const body = document.createElement('div');
-    body.className = 'checkpoint-body';
-    const label = document.createElement('div');
-    label.className = 'day-label' + (myDays[i] ? ' done-label' : '');
-    label.textContent = TASKS[i];
-    const note = document.createElement('input');
-    note.type = 'text';
-    note.className = 'note';
-    note.maxLength = 80;
-    note.placeholder = 'Add a note (optional)';
-    note.value = myNotes[i] || '';
-    note.addEventListener('input', () => {
-      myNotes[i] = note.value;
-      queueSave();
-    });
-    body.appendChild(label);
-    body.appendChild(note);
-
-    row.appendChild(markerCol);
-    row.appendChild(body);
-    trailList.appendChild(row);
-  }
+  renderColumn(colTodo, groups.todo, 'todo');
+  renderColumn(colPending, groups.pending, 'pending');
+  renderColumn(colCompleted, groups.completed, 'completed');
 }
 
-function toggleTask(i){
-  myDays[i] = !myDays[i];
-  renderEmployeeTracker();
-  queueSave();
+function renderColumn(container, tasks, status){
+  if(tasks.length === 0){
+    container.innerHTML = '<div class="col-empty">Nothing here yet.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  for(const t of tasks){
+    const card = document.createElement('div');
+    card.className = 'task-card' + (t.status === 'completed' ? ' completed' : '');
+
+    const title = document.createElement('div');
+    title.className = 'task-title';
+    title.textContent = t.title;
+
+    const actions = document.createElement('div');
+    actions.className = 'task-actions';
+
+    const select = document.createElement('select');
+    ['todo','pending','completed'].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = STATUS_LABELS[s];
+      if(s === t.status) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.addEventListener('change', () => {
+      t.status = select.value;
+      t.updatedAt = Date.now();
+      renderMyTasks();
+      saveMyTasks();
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', () => {
+      myTasks = myTasks.filter(x => x.id !== t.id);
+      renderMyTasks();
+      saveMyTasks();
+    });
+
+    actions.appendChild(select);
+    actions.appendChild(delBtn);
+    card.appendChild(title);
+    card.appendChild(actions);
+    container.appendChild(card);
+  }
 }
 
 let saveDebounce = null;
 function queueSave(){
-  saveStatus.textContent = 'Saving…';
   if(saveDebounce) clearTimeout(saveDebounce);
-  saveDebounce = setTimeout(saveMyEntry, 500);
+  saveDebounce = setTimeout(saveMyTasks, 400);
 }
-
-async function saveMyEntry(){
+async function saveMyTasks(){
+  saveStatus.textContent = 'Saving…';
   try{
-    const payload = {
-      name: myUsername,
-      days: myDays,
-      notes: myNotes,
-      updatedAt: Date.now()
-    };
-    const result = await window.storage.set(trackerKey(myUsername), JSON.stringify(payload), true);
+    const payload = { name: myUsername, tasks: myTasks, updatedAt: Date.now() };
+    const result = await window.storage.set(tasksKey(myUsername), JSON.stringify(payload), true);
     if(result){
       saveStatus.textContent = 'Saved just now';
       setTimeout(() => { if(saveStatus.textContent === 'Saved just now') saveStatus.textContent = ''; }, 2000);
@@ -1097,155 +690,215 @@ async function saveMyEntry(){
   }
 }
 
-resetBtn.addEventListener('click', async () => {
-  myDays = Array(TOTAL_TASKS).fill(false);
-  myNotes = Array(TOTAL_TASKS).fill('');
-  renderEmployeeTracker();
-  await saveMyEntry();
-});
-
-async function fetchAllEntries(){
-  const list = await window.storage.list('tracker:', true);
-  if(!list || !list.keys || list.keys.length === 0) return [];
-  const entries = [];
+async function fetchAllAccounts(){
+  const list = await window.storage.list('account:', true);
+  if(!list || !list.keys) return [];
+  const accounts = [];
   for(const k of list.keys){
     try{
       const res = await window.storage.get(k, true);
-      if(res && res.value) entries.push(JSON.parse(res.value));
-    }catch(e){ /* skip unreadable entry */ }
+      if(res && res.value) accounts.push(JSON.parse(res.value));
+    }catch(e){ /* skip */ }
   }
-  entries.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
-  return entries;
+  return accounts;
+}
+
+async function fetchAllTaskRecords(){
+  const list = await window.storage.list('tasks:', true);
+  if(!list || !list.keys) return {};
+  const map = {};
+  for(const k of list.keys){
+    try{
+      const res = await window.storage.get(k, true);
+      if(res && res.value){
+        const data = JSON.parse(res.value);
+        if(data.name) map[data.name.trim().toLowerCase()] = data;
+      }
+    }catch(e){ /* skip */ }
+  }
+  return map;
+}
+
+function countStatuses(tasks){
+  const c = { todo: 0, pending: 0, completed: 0 };
+  for(const t of tasks) if(c[t.status] !== undefined) c[t.status]++;
+  return c;
 }
 
 async function refreshData(){
-  let entries = [];
+  let accounts = [], taskMap = {};
   try{
-    entries = await fetchAllEntries();
+    [accounts, taskMap] = await Promise.all([fetchAllAccounts(), fetchAllTaskRecords()]);
   }catch(e){
-    if(!isAdmin) board.innerHTML = '<div class="board-msg">Couldn\'t load the camp board right now.</div>';
+    if(!isAdmin) teamBoard.innerHTML = '<div class="board-msg">Couldn\'t load the team overview right now.</div>';
     else roster.innerHTML = '<div class="board-msg">Couldn\'t load the roster right now.</div>';
     return;
   }
-  renderOverview(entries);
-  if(isAdmin){
-    renderRoster(entries);
-  }else{
-    renderBoard(entries);
-  }
+
+  const combined = accounts.map(acc => {
+    const rec = taskMap[acc.username.trim().toLowerCase()] || { tasks: [], updatedAt: acc.createdAt };
+    return { username: acc.username, tasks: rec.tasks || [], updatedAt: rec.updatedAt || acc.createdAt };
+  });
+  combined.sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+
+  renderOverview(combined);
+  if(isAdmin) renderRoster(combined);
+  else renderTeamBoard(combined);
 }
 
-function renderOverview(entries){
-  const count = entries.length;
-  document.getElementById('ovCount').textContent = count;
-  if(count === 0){
-    document.getElementById('ovAvg').textContent = '—';
-    document.getElementById('ovLeader').textContent = '—';
-    document.getElementById('ovLast').textContent = '—';
-    return;
+function renderOverview(combined){
+  document.getElementById('ovEmployees').textContent = combined.length;
+  let completed = 0, inProgress = 0;
+  for(const e of combined){
+    const c = countStatuses(e.tasks);
+    completed += c.completed;
+    inProgress += c.todo + c.pending;
   }
-  let totalDone = 0, maxDone = -1, leader = '', lastTs = 0;
-  for(const e of entries){
-    const done = (e.days||[]).filter(Boolean).length;
-    totalDone += done;
-    if(done > maxDone){ maxDone = done; leader = e.name; }
-    if((e.updatedAt||0) > lastTs) lastTs = e.updatedAt||0;
-  }
-  const avgPct = Math.round((totalDone / (count*TOTAL_TASKS)) * 100);
-  document.getElementById('ovAvg').textContent = avgPct + '%';
-  document.getElementById('ovLeader').textContent = leader + ' (' + maxDone + '/' + TOTAL_TASKS + ')';
-  document.getElementById('ovLast').textContent = timeAgo(lastTs);
+  document.getElementById('ovCompleted').textContent = completed;
+  document.getElementById('ovInProgress').textContent = inProgress;
+  const total = completed + inProgress;
+  document.getElementById('ovRate').textContent = total === 0 ? '0%' : Math.round((completed/total)*100) + '%';
 }
 
-function renderBoard(entries){
-  board.innerHTML = '';
-  if(entries.length === 0){
-    board.innerHTML = '<div class="empty-board">No one else has started yet — be the first mark on the board.</div>';
+function renderTeamBoard(combined){
+  teamBoard.innerHTML = '';
+  if(combined.length === 0){
+    teamBoard.innerHTML = '<div class="empty-msg">No one else has an account yet.</div>';
     return;
   }
-  for(const entry of entries){
+  for(const e of combined){
+    const c = countStatuses(e.tasks);
     const row = document.createElement('div');
-    row.className = 'hiker-row';
+    row.className = 'member-row';
 
     const top = document.createElement('div');
-    top.className = 'hiker-top';
+    top.className = 'member-top';
     const nameEl = document.createElement('div');
-    nameEl.className = 'hiker-name';
-    const isYou = myUsername && entry.name && entry.name.trim().toLowerCase() === myUsername.trim().toLowerCase();
-    nameEl.textContent = entry.name + ' ';
+    nameEl.className = 'member-name';
+    const isYou = myUsername && e.username.trim().toLowerCase() === myUsername.trim().toLowerCase();
+    nameEl.textContent = e.username + ' ';
     if(isYou){
       const tag = document.createElement('span');
-      tag.className = 'you-tag';
-      tag.textContent = '(you)';
+      tag.className = 'you-tag'; tag.textContent = '(you)';
       nameEl.appendChild(tag);
     }
     const updated = document.createElement('div');
-    updated.className = 'hiker-updated';
-    updated.textContent = timeAgo(entry.updatedAt);
-    top.appendChild(nameEl);
-    top.appendChild(updated);
+    updated.className = 'member-updated';
+    updated.textContent = timeAgo(e.updatedAt);
+    top.appendChild(nameEl); top.appendChild(updated);
 
-    const mini = document.createElement('div');
-    mini.className = 'mini-trail';
-    const days = entry.days || Array(TOTAL_TASKS).fill(false);
-    days.forEach(d => {
-      const dot = document.createElement('div');
-      dot.className = 'mini-dot' + (d ? ' done' : '');
-      mini.appendChild(dot);
-    });
+    const counts = document.createElement('div');
+    counts.className = 'member-counts';
+    counts.innerHTML = '<b>' + c.completed + '</b> completed · ' + c.pending + ' pending · ' + c.todo + ' to do';
 
     row.appendChild(top);
-    row.appendChild(mini);
-
-    const notes = entry.notes || [];
-    const lastNoteIdx = [...notes].reverse().findIndex(n => n && n.trim());
-    if(lastNoteIdx !== -1){
-      const realIdx = notes.length - 1 - lastNoteIdx;
-      const noteEl = document.createElement('p');
-      noteEl.className = 'hiker-note';
-      noteEl.textContent = '"' + notes[realIdx] + '" — ' + (TASKS[realIdx] || 'task ' + (realIdx+1));
-      row.appendChild(noteEl);
-    }
-
-    board.appendChild(row);
+    row.appendChild(counts);
+    teamBoard.appendChild(row);
   }
 }
 
-function renderRoster(entries){
+function renderRoster(combined){
   roster.innerHTML = '';
-  if(entries.length === 0){
-    roster.innerHTML = '<div class="empty-board">No one has started yet.</div>';
+  if(combined.length === 0){
+    roster.innerHTML = '<div class="empty-msg">No employees have signed up yet.</div>';
     return;
   }
-  for(const entry of entries){
-    const done = (entry.days||[]).filter(Boolean).length;
+  for(const e of combined){
+    const c = countStatuses(e.tasks);
     const row = document.createElement('div');
     row.className = 'roster-row';
 
+    const top = document.createElement('div');
+    top.className = 'roster-top';
+
+    const left = document.createElement('div');
     const nameEl = document.createElement('div');
     nameEl.className = 'roster-name';
-    nameEl.textContent = entry.name;
+    nameEl.textContent = e.username;
+    const countsEl = document.createElement('div');
+    countsEl.className = 'roster-counts';
+    countsEl.innerHTML = '<b class="c-completed">' + c.completed + '</b> completed · <b class="c-pending">' + c.pending + '</b> pending · <b class="c-todo">' + c.todo + '</b> to do';
+    left.appendChild(nameEl);
+    left.appendChild(countsEl);
 
-    const mini = document.createElement('div');
-    mini.className = 'mini-trail';
-    const days = entry.days || Array(TOTAL_TASKS).fill(false);
-    days.forEach((d, idx) => {
-      const dot = document.createElement('div');
-      dot.className = 'mini-dot' + (d ? ' done' : '');
-      dot.title = TASKS[idx];
-      mini.appendChild(dot);
+    const right = document.createElement('div');
+    right.className = 'roster-btns';
+
+    const updatedEl = document.createElement('span');
+    updatedEl.className = 'roster-updated';
+    updatedEl.style.marginRight = '4px';
+    updatedEl.textContent = timeAgo(e.updatedAt);
+
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'ghost';
+    viewBtn.textContent = expandedRosterUser === e.username ? 'Hide tasks' : 'View tasks';
+    viewBtn.addEventListener('click', () => {
+      expandedRosterUser = expandedRosterUser === e.username ? null : e.username;
+      renderRoster(combined);
     });
 
-    const progressEl = document.createElement('div');
-    progressEl.className = 'roster-progress';
-    progressEl.textContent = done + '/' + TOTAL_TASKS + ' · ' + timeAgo(entry.updatedAt);
+    right.appendChild(updatedEl);
+    right.appendChild(viewBtn);
 
-    row.appendChild(nameEl);
-    row.appendChild(mini);
-    row.appendChild(progressEl);
-     row.insertAdjacentHTML('beforeend', renderAdminEmployeeActions(entry));
+    if(confirmingDeleteUser === e.username){
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'ghost danger';
+      confirmBtn.textContent = 'Confirm delete';
+      confirmBtn.addEventListener('click', () => deleteEmployee(e.username));
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'ghost';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', () => { confirmingDeleteUser = null; renderRoster(combined); });
+      right.appendChild(confirmBtn);
+      right.appendChild(cancelBtn);
+    }else{
+      const delBtn = document.createElement('button');
+      delBtn.className = 'ghost danger';
+      delBtn.textContent = 'Delete employee';
+      delBtn.addEventListener('click', () => { confirmingDeleteUser = e.username; renderRoster(combined); });
+      right.appendChild(delBtn);
+    }
+
+    top.appendChild(left);
+    top.appendChild(right);
+    row.appendChild(top);
+
+    if(expandedRosterUser === e.username){
+      const detail = document.createElement('div');
+      detail.className = 'roster-detail';
+      if(e.tasks.length === 0){
+        detail.innerHTML = '<div class="col-empty">No tasks added yet.</div>';
+      }else{
+        for(const t of e.tasks){
+          const line = document.createElement('div');
+          line.className = 'task-line';
+          const label = document.createElement('span');
+          label.textContent = t.title;
+          const pill = document.createElement('span');
+          pill.className = 'status-pill ' + t.status;
+          pill.textContent = STATUS_LABELS[t.status] || t.status;
+          line.appendChild(label);
+          line.appendChild(pill);
+          detail.appendChild(line);
+        }
+      }
+      row.appendChild(detail);
+    }
+
     roster.appendChild(row);
   }
+}
+
+async function deleteEmployee(username){
+  try{
+    await window.storage.delete(accountKey(username), true);
+  }catch(e){ /* ignore */ }
+  try{
+    await window.storage.delete(tasksKey(username), true);
+  }catch(e){ /* ignore */ }
+  confirmingDeleteUser = null;
+  expandedRosterUser = expandedRosterUser === username ? null : expandedRosterUser;
+  refreshData();
 }
 
 function timeAgo(ts){
@@ -1260,467 +913,7 @@ function timeAgo(ts){
   return days + 'd ago';
 }
 
-
-// Browser storage compatibility layer
-// Keeps the original interface unchanged while enabling signup/login in normal browsers.
-if (!window.storage) {
-  window.storage = {
-    async get(key, shared=false) {
-      const value = localStorage.getItem((shared ? "shared:" : "private:") + key);
-      return value === null ? null : { value };
-    },
-    async set(key, value, shared=false) {
-      localStorage.setItem((shared ? "shared:" : "private:") + key, value);
-      return { value };
-    },
-    async delete(key, shared=false) {
-      localStorage.removeItem((shared ? "shared:" : "private:") + key);
-      return true;
-    },
-    async list(prefix, shared=false) {
-      const base = shared ? "shared:" : "private:";
-      const keys = [];
-      for (let i=0;i<localStorage.length;i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith(base + prefix)) {
-          keys.push(k.replace(base, ""));
-        }
-      }
-      return { keys };
-    }
-  };
-}
-
-
-// Employee Task Tracker upgrades
-const TASK_STATUS = ["Pending","Accomplished","On Progress","Incomplete"];
-
-function getToday(){
- return new Date().toLocaleDateString();
-}
-
-function saveEmployeeTask(employee, taskIndex, status){
- let key = trackerKey(employee);
- window.storage.get(key,true).then(res=>{
-   let data = res && res.value ? JSON.parse(res.value) : {
-    name:employee,tasks:[]
-   };
-   if(data.tasks){
-     data.tasks[taskIndex].status=status;
-     data.tasks[taskIndex].date=getToday();
-   }
-   window.storage.set(key,JSON.stringify(data),true);
- });
-}
-
-// Admin task creation helper
-function createAdminTask(employee, title){
- window.storage.get(trackerKey(employee),true).then(res=>{
-   let data=res && res.value ? JSON.parse(res.value):{name:employee,tasks:[]};
-   data.tasks=data.tasks||[];
-   data.tasks.push({
-     title:title,
-     status:"Pending",
-     date:getToday()
-   });
-   window.storage.set(trackerKey(employee),JSON.stringify(data),true);
- });
-}
-
-// Employee privacy: only current user's tracker rendered.
-// Admin functions can access all shared tracker records.
-
-
-// Admin employee management extensions
-async function adminLoadEmployees(){
-    const list = await window.storage.list('tracker:', true);
-    const select = document.getElementById('adminEmployeeSelect');
-    if(!select) return;
-
-    select.innerHTML = "";
-
-    if(list && list.keys){
-        for(const key of list.keys){
-            const res = await window.storage.get(key,true);
-            if(res && res.value){
-                const emp = JSON.parse(res.value);
-                if(emp.name){
-                    select.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
-                }
-            }
-        }
-    }
-}
-
-async function adminAddTask(){
-    const employee = document.getElementById("adminEmployeeSelect").value;
-    const taskName = document.getElementById("adminTaskName").value.trim();
-    const daySelect = document.getElementById("adminTaskDay");
-    const day = daySelect ? daySelect.value : "Day 1";
-
-    if(!employee || !taskName){
-        alert("Please select employee and enter task.");
-        return;
-    }
-
-    const res = await window.storage.get(trackerKey(employee), true);
-
-    let data = res && res.value
-        ? JSON.parse(res.value)
-        : {name:employee,tasks:[]};
-
-    data.tasks = data.tasks || [];
-
-    data.tasks.push({
-        title: taskName,
-        day: day,
-        status: "Pending",
-        createdAt: Date.now()
-    });
-
-    data.updatedAt = Date.now();
-
-    await window.storage.set(
-        trackerKey(employee),
-        JSON.stringify(data),
-        true
-    );
-
-    document.getElementById("adminTaskName").value = "";
-
-    await refreshData();
-
-    if(typeof renderEmployeeStatus === "function"){
-        renderEmployeeStatus();
-    }
-}
-
-async function adminDeleteEmployee(username){
-    if(!confirm("Delete employee "+username+"?")) return;
-
-    await window.storage.delete(trackerKey(username),true);
-    await window.storage.delete(accountKey(username),true);
-
-    refreshData();
-    adminLoadEmployees();
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-    const btn=document.getElementById("addEmployeeTaskBtn");
-    if(btn){
-        btn.addEventListener("click",adminAddTask);
-    }
-});
-
-
-let selectedEmployeeForTask="";
-
-function openTaskModal(employee){
- selectedEmployeeForTask=employee;
- document.getElementById("selectedEmployee").innerText="Assign task to: "+employee;
- document.getElementById("taskModal").style.display="flex";
-}
-
-function closeTaskModal(){
- document.getElementById("taskModal").style.display="none";
-}
-
-
-async function confirmAddTask(){
-    const task = document.getElementById("modalTaskName").value.trim();
-    const day = document.getElementById("taskDaySelect").value;
-
-    if(!task || !selectedEmployeeForTask){
-        alert("Please enter a task.");
-        return;
-    }
-
-    const res = await window.storage.get(trackerKey(selectedEmployeeForTask), true);
-
-    let employee = res && res.value 
-        ? JSON.parse(res.value)
-        : {name:selectedEmployeeForTask, tasks:[]};
-
-    if(!employee.tasks){
-        employee.tasks = [];
-    }
-
-    employee.tasks.push({
-        title: task,
-        day: day,
-        status: "Pending",
-        createdAt: Date.now()
-    });
-
-    employee.updatedAt = Date.now();
-
-    await window.storage.set(
-        trackerKey(selectedEmployeeForTask),
-        JSON.stringify(employee),
-        true
-    );
-
-    document.getElementById("modalTaskName").value="";
-    document.getElementById("taskDaySelect").value="Day 1";
-
-    closeTaskModal();
-
-    refreshData();
-    if(typeof renderAssignedTasks === "function") renderAssignedTasks();
-
-    if(typeof renderEmployeeStatus === "function"){
-        renderEmployeeStatus();
-    }
-}
-
-
-async function deleteEmployeeFull(name){
- if(!confirm("Delete employee "+name+" permanently?")) return;
-
- await window.storage.delete(trackerKey(name),true);
- await window.storage.delete(accountKey(name),true);
-
- refreshData();
-}
-
-
-
-
-async function renderEmployeeStatus(){
- const list=document.getElementById("employeeStatusList");
- if(!list) return;
-
- list.innerHTML="";
-
- const entries=await fetchAllEntries();
-
- if(entries.length===0){
-   list.innerHTML="<p>No employees found.</p>";
-   return;
- }
-
- entries.forEach(emp=>{
-   let tasks=emp.tasks||[];
-
-   let accomplished=tasks.filter(t=>t.status==="Accomplished");
-   let pending=tasks.filter(t=>t.status==="Pending");
-   let progress=tasks.filter(t=>t.status==="On Progress");
-
-   list.innerHTML += `
-   <div class="status-box">
-   <b>Employee: ${emp.name}</b><br>
-   
-
-   <div class="status-accomplished">
-   Accomplished Task:
-   ${accomplished.length ? accomplished.map(t=>t.title).join(", ") : "None"}
-   </div>
-
-   <div class="status-pending">
-   Pending Task:
-   ${pending.length ? pending.map(t=>t.title).join(", ") : "None"}
-   </div>
-
-   <div class="status-progress">
-   On Progress Task:
-   ${progress.length ? progress.map(t=>t.title).join(", ") : "None"}
-   </div>
-
-   
-
-   </div>`;
- });
-}
-
-async function refreshAdminData(){
- await refreshData();
- await renderEmployeeStatus();
-}
-
-
-
-
-async function renderAssignedTasks(){
- const box=document.getElementById("assignedTasksList");
- if(!box || !myUsername) return;
-
- const res=await window.storage.get(trackerKey(myUsername),true);
-
- if(!res || !res.value){
-   box.innerHTML="No assigned tasks";
-   return;
- }
-
- const data=JSON.parse(res.value);
- const tasks=data.tasks||[];
-
- if(tasks.length===0){
-   box.innerHTML="No assigned tasks";
-   return;
- }
-
- box.innerHTML=tasks.map((t,index)=>`
- <div class="status-box">
- <b>${t.day || ""} ${t.title}</b><br>
-
- <div class="task-check">
- <input type="checkbox"
- ${t.status==="Accomplished" ? "checked" : ""}
- onclick="completeAssignedTask(${index}, this.checked)">
-
- <span class="${t.status==="Accomplished" ? "task-complete":""}">
- ${t.status || "Pending"}
- </span>
-
- </div>
- </div>
- `).join("");
-}
-
-async function completeAssignedTask(index,checked){
- const res=await window.storage.get(trackerKey(myUsername),true);
- if(!res || !res.value) return;
-
- const data=JSON.parse(res.value);
-
- if(data.tasks && data.tasks[index]){
-   data.tasks[index].status=checked ? "Accomplished" : "Pending";
-   data.tasks[index].completedAt=checked ? Date.now() : null;
-   data.updatedAt=Date.now();
- }
-
- await window.storage.set(
- trackerKey(myUsername),
- JSON.stringify(data),
- true
- );
-
- renderAssignedTasks();
- refreshData();
-}
-
-
-
-
-async function adminDeleteSelectedEmployee(){
- const select=document.getElementById("adminEmployeeSelect");
- if(!select || !select.value) return;
-
- const employee=select.value;
-
- if(!confirm("Delete user "+employee+"?")) return;
-
- await window.storage.delete(trackerKey(employee),true);
- await window.storage.delete(accountKey(employee),true);
-
- refreshData();
- renderEmployeeStatus();
- adminLoadEmployees();
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
- const del=document.getElementById("deleteEmployeeBtn");
- if(del){
-   del.addEventListener("click",adminDeleteSelectedEmployee);
- }
-});
-
-
-async function assignTaskFromPanel(){
- const employee=document.getElementById("adminEmployeeSelect").value;
- const task=document.getElementById("adminTaskName").value.trim();
- const day=document.getElementById("taskDaySelect").value;
-
- if(!employee || !task) return;
-
- const res=await window.storage.get(trackerKey(employee),true);
- let data=res && res.value ? JSON.parse(res.value) : {name:employee,tasks:[]};
-
- data.tasks=data.tasks||[];
- data.tasks.push({
-   title:task,
-   day:day,
-   status:"Pending",
-   createdAt:Date.now()
- });
-
- data.updatedAt=Date.now();
-
- await window.storage.set(trackerKey(employee),JSON.stringify(data),true);
-
- document.getElementById("adminTaskName").value="";
- refreshData();
-}
-
-
-
-// REALTIME_SYNC
-// Sync employee/admin views every few seconds so new admin tasks appear automatically.
-function startRealtimeSync(){
-    setInterval(async ()=>{
-        try{
-            if(typeof refreshData === "function"){
-                await refreshData();
-            }
-            if(typeof renderAssignedTasks === "function" && myUsername){
-                await renderAssignedTasks();
-            }
-            if(typeof renderEmployeeStatus === "function"){
-                await renderEmployeeStatus();
-            }
-        }catch(e){}
-    },3000);
-}
-
-startRealtimeSync();
 init();
 </script>
-
-<div id="taskModal" style="display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;">
-<div class="panel" style="width:350px;">
-<h2>Add Task</h2>
-<p id="selectedEmployee"></p>
-<select id="adminTaskDaySelect">
-<option>Day 1</option>
-<option>Day 2</option>
-<option>Day 3</option>
-<option>Day 4</option>
-<option>Day 5</option>
-<option>Day 6</option>
-<option>Day 7</option>
-<option>Day 8</option>
-<option>Day 9</option>
-<option>Day 10</option>
-</select>
-<select id="taskDaySelect" class="admin-day-select">
-<option value="Day 1">Day 1</option>
-<option value="Day 2">Day 2</option>
-<option value="Day 3">Day 3</option>
-<option value="Day 4">Day 4</option>
-<option value="Day 5">Day 5</option>
-<option value="Day 6">Day 6</option>
-<option value="Day 7">Day 7</option>
-<option value="Day 8">Day 8</option>
-<option value="Day 9">Day 9</option>
-<option value="Day 10">Day 10</option>
-</select>
-<input id="modalTaskName" placeholder="Task name" style="width:100%;">
-<select id="modalTaskDay" style="width:100%;margin-top:10px;">
-<option value="Day 1">Day 1</option>
-<option value="Day 2">Day 2</option>
-<option value="Day 3">Day 3</option>
-<option value="Day 4">Day 4</option>
-<option value="Day 5">Day 5</option>
-<option value="Day 6">Day 6</option>
-<option value="Day 7">Day 7</option>
-<option value="Day 8">Day 8</option>
-<option value="Day 9">Day 9</option>
-<option value="Day 10">Day 10</option>
-</select>
-<button class="primary" onclick="confirmAddTask()">Add Task</button>
-<button class="ghost" onclick="closeTaskModal()">Cancel</button>
-</div>
-</div>
-
 </body>
 </html>
